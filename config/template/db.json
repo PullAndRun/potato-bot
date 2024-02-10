@@ -1,0 +1,16 @@
+{
+  "dev": {
+    "host": "127.0.0.1",
+    "port": 2001,
+    "username": "postgres",
+    "password": "",
+    "database": "bot"
+  },
+  "prod": {
+    "host": "craft-net",
+    "port": 5432,
+    "username": "postgres",
+    "password": "",
+    "database": "bot"
+  }
+}

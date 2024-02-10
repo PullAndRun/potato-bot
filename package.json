@@ -1,0 +1,23 @@
+{
+  "name": "potato-bot",
+  "version": "0.0.1",
+  "description": "potato-bot",
+  "type": "module",
+  "scripts": {
+    "bot": "node --loader ts-node/esm --no-warnings app/main.ts"
+  },
+  "license": "GPL-3.0",
+  "dependencies": {
+    "@potato/icqq": "file:package/icqq",
+    "@potato/config": "file:config",
+    "consola": "^3.2.3",
+    "dayjs": "^1.11.10",
+    "pg": "^8.11.3",
+    "reflect-metadata": "^0.2.1",
+    "ts-node": "^10.9.2",
+    "typeorm": "^0.3.20"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.16"
+  }
+}
