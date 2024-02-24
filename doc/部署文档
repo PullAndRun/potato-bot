@@ -1,0 +1,29 @@
+---数据库容器
+docker run \
+    --name postgresql \
+    --restart=always \
+    -d \
+    -e TZ=Asia/Shanghai \
+    -e POSTGRES_PASSWORD=change-this \
+    -e PGDATA=/var/lib/postgresql/data/pgdata \
+    -v change-this:/var/lib/postgresql/data \
+    --network change-this \
+    -p change-this:5432 \
+    postgres
+
+---bot容器
+docker run \
+    --name bot \
+    --restart=always \
+    -d \
+    -e TZ=Asia/Shanghai \
+    -v change-this:/data \
+    --network change-this \
+    node /bin/bash \
+    -c "cd /data && npm run prod"
+
+---容器网络
+docker network create change-this
+
+---icqq
+npm login --scope=@icqqjs --auth-type=legacy --registry=https://npm.pkg.github.com

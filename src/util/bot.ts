@@ -1,4 +1,4 @@
-import { Client, createClient } from "@potato/icqq";
+import { Client, createClient } from "@icqqjs/icqq";
 
 const bots: Client[] = [];
 const client = createClient({});

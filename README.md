@@ -3,8 +3,6 @@
 --
 依赖：
 
-icqq 依赖于 package/icqq
-
 ffmpeg 依赖于 resource/ffmpeg
 
 --

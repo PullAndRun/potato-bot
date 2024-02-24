@@ -2,6 +2,7 @@
 !/config/template
 /node_modules
 /package-lock.json
-/package/icqq
-/resource/ffmpeg
+/lib/icqq
+/lib/ffmpeg
 /log
+/doc/private

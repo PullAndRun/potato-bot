@@ -4,13 +4,17 @@
     "port": 2001,
     "username": "postgres",
     "password": "",
-    "database": "bot"
+    "database": "bot",
+    "synchronize": true,
+    "logging": true
   },
   "prod": {
     "host": "craft-net",
     "port": 5432,
     "username": "postgres",
     "password": "",
-    "database": "bot"
+    "database": "bot",
+    "synchronize": true,
+    "logging": false
   }
 }
