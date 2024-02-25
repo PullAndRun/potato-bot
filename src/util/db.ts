@@ -5,6 +5,7 @@ import { logger } from "./logger.js";
 
 const dataSource = new DataSource({
   type: "postgres",
+  entities: ["src/model/*.ts"],
   ...dbConf[<"dev" | "prod">envConf.env],
 });
 
@@ -13,11 +14,8 @@ async function init() {
     .initialize()
     .then((_) => logger.log("数据库初始化成功。"))
     .catch((e) => {
-      logger.error("错误：数据库初始化失败。");
-      throw new Error(e);
+      throw new Error(`错误，数据库初始化失败:\n${e}`);
     });
 }
-
-init();
 
 export { dataSource as db, init };

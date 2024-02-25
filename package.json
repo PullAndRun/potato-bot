@@ -10,6 +10,7 @@
   "dependencies": {
     "@icqqjs/icqq": "^1.0.2",
     "@potato/config": "file:config",
+    "@potato/bot": "file:src",
     "consola": "^3.2.3",
     "dayjs": "^1.11.10",
     "pg": "^8.11.3",

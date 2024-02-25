@@ -29,7 +29,7 @@ const consola = createConsola({
         //创建文件夹
         await mkdir(`${path.resolve()}/log/${folderName}`, {
           recursive: true,
-        });
+        }).catch((_) => undefined);
         //写文件
         await appendFile(
           `${path.resolve()}/log/${folderName}/${logObj.type}`,
@@ -37,7 +37,7 @@ const consola = createConsola({
           {
             flag: "a",
           }
-        );
+        ).catch((_) => undefined);
         //终端打印log
         if (logObj.level <= logConf[<"prod" | "dev">envConf.env].level) {
           console.log(jsonLog);
