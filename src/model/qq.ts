@@ -6,7 +6,7 @@ class QQ extends BaseEntity {
   id: number;
 
   @Column({ type: "float", unique: true, comment: "qq号" })
-  qid: number;
+  uin: number;
 
   @Column({ type: "text", comment: "qq密码" })
   password: string;
@@ -22,4 +22,8 @@ class QQ extends BaseEntity {
   active: boolean;
 }
 
-export { QQ };
+async function getActiveAccount() {
+  return QQ.find({ where: { active: true }, order: { order: "ASC" } });
+}
+
+export { QQ, getActiveAccount };

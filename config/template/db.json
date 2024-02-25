@@ -6,7 +6,8 @@
     "password": "",
     "database": "bot",
     "synchronize": true,
-    "logging": true
+    "logging": true,
+    "entities": ["src/model/*.ts"]
   },
   "prod": {
     "host": "craft-net",
@@ -15,6 +16,7 @@
     "password": "",
     "database": "bot",
     "synchronize": true,
-    "logging": false
+    "logging": false,
+    "entities": ["src/model/*.ts"]
   }
 }

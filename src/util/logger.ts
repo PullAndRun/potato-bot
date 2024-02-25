@@ -1,9 +1,9 @@
+import envConf from "@potato/config/env.json" assert { type: "json" };
+import logConf from "@potato/config/log.json" assert { type: "json" };
 import { createConsola } from "consola";
 import dayjs from "dayjs";
 import { appendFile, mkdir } from "fs/promises";
 import path from "path";
-import envConf from "@potato/config/env.json" assert { type: "json" };
-import logConf from "@potato/config/log.json" assert { type: "json" };
 
 /*
   0: Fatal and Error

@@ -9,15 +9,18 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@icqqjs/icqq": "^1.0.2",
-    "@potato/config": "file:config",
     "@potato/bot": "file:src",
+    "@potato/config": "file:config",
     "consola": "^3.2.3",
     "dayjs": "^1.11.10",
+    "node-schedule": "^2.1.1",
     "pg": "^8.11.3",
     "ts-node": "^10.9.2",
-    "typeorm": "^0.3.20"
+    "typeorm": "^0.3.20",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/node": "^20.11.20"
+    "@types/node": "^20.11.20",
+    "@types/node-schedule": "^2.1.6"
   }
 }
