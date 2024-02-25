@@ -2,7 +2,6 @@ import { QQ } from "@potato/bot/model/qq.js";
 import * as db from "@potato/bot/util/db.js";
 
 async function insertQQAccount(qid: number, password: string) {
-  await db.init();
   const qq = new QQ();
   qq.uin = qid;
   qq.password = password;
@@ -10,7 +9,6 @@ async function insertQQAccount(qid: number, password: string) {
 }
 
 async function showQQAccount() {
-  await db.init();
   const allUser = await QQ.find({
     order: {
       order: "ASC",
@@ -18,3 +16,11 @@ async function showQQAccount() {
   });
   console.log(allUser);
 }
+
+async function use() {
+  await db.init();
+  //await insertQQAccount();
+  //await showQQAccount();
+}
+
+use();

@@ -1,0 +1,6 @@
+{
+  "sign_api_addr": "",
+  "ffmpeg_path": "lib/ffmpeg",
+  "ffprobe_path": "lib/ffmpeg",
+  "data_dir": "data/bot"
+}
