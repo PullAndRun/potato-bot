@@ -3,17 +3,12 @@
 --
 依赖：
 
-ffmpeg 依赖于 resource/ffmpeg
+ffmpeg 依赖于 lib/ffmpeg
 
 --
 配置：
 
 config/template/\* 复制到 config
-
---
-线上模式：
-
-config/env.json 修改 env = "dev" | "prod"
 
 --
 运行：

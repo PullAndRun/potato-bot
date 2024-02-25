@@ -32,7 +32,12 @@ schedule.scheduleJob(`0 */5 * * * *`, async () => {
 
 //登陆一个QQ账户
 async function loginOneAccount(uin: number, password: string, order: number) {
-  const client = createClient(botConf);
+  const client = createClient({
+    sign_api_addr: botConf.sign_api_addr,
+    ffmpeg_path: botConf.ffmpeg_path,
+    ffprobe_path: botConf.ffprobe_path,
+    data_dir: botConf.data_dir,
+  });
   client
     .on("system.login.slider", async (v) => {
       const ticket = await consola.prompt(

@@ -1,5 +1,4 @@
-import envConf from "@potato/config/env.json" assert { type: "json" };
-import logConf from "@potato/config/log.json" assert { type: "json" };
+import logConf from "@potato/config/log.json";
 import { createConsola } from "consola";
 import dayjs from "dayjs";
 import { appendFile, mkdir } from "fs/promises";
@@ -39,7 +38,7 @@ const consola = createConsola({
           }
         ).catch((_) => undefined);
         //终端打印log
-        if (logObj.level <= logConf[<"prod" | "dev">envConf.env].level) {
+        if (logObj.level <= logConf.level) {
           console.log(jsonLog);
         }
       },

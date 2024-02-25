@@ -1,11 +1,17 @@
-import dbConf from "@potato/config/db.json" assert { type: "json" };
-import envConf from "@potato/config/env.json" assert { type: "json" };
+import dbConf from "@potato/config/db.json";
 import { DataSource } from "typeorm";
 import { logger } from "./logger.js";
 
 const dataSource = new DataSource({
   type: "postgres",
-  ...dbConf[<"dev" | "prod">envConf.env],
+  host: dbConf.host,
+  port: dbConf.port,
+  username: dbConf.username,
+  password: dbConf.password,
+  database: dbConf.database,
+  synchronize: dbConf.synchronize,
+  logging: dbConf.logging,
+  entities: dbConf.entities,
 });
 
 async function init() {

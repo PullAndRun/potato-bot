@@ -1,22 +1,10 @@
 {
-  "dev": {
-    "host": "127.0.0.1",
-    "port": 2001,
-    "username": "postgres",
-    "password": "",
-    "database": "bot",
-    "synchronize": true,
-    "logging": true,
-    "entities": ["src/model/*.ts"]
-  },
-  "prod": {
-    "host": "craft-net",
-    "port": 5432,
-    "username": "postgres",
-    "password": "",
-    "database": "bot",
-    "synchronize": true,
-    "logging": false,
-    "entities": ["src/model/*.ts"]
-  }
+  "host": "127.0.0.1",
+  "port": 2001,
+  "username": "postgres",
+  "password": "",
+  "database": "bot",
+  "synchronize": true,
+  "logging": true,
+  "entities": ["src/model/*.ts"]
 }

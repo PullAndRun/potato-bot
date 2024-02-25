@@ -1,8 +1,3 @@
 {
-  "prod": {
-    "level": 2
-  },
-  "dev": {
-    "level": 5
-  }
+  "level": 5
 }
