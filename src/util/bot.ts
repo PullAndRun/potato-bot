@@ -2,8 +2,8 @@ import { Client, createClient } from "@icqqjs/icqq";
 import botConf from "@potato/config/bot.json";
 import consola from "consola";
 import schedule from "node-schedule";
-import { getActiveAccount } from "../model/qq.js";
-import { sleep } from "./util.js";
+import { findActiveAccount } from "../model/qq.ts";
+import { sleep } from "./util.ts";
 
 const bots: Array<Client | undefined> = [];
 
@@ -14,16 +14,13 @@ schedule.scheduleJob(`0 */5 * * * *`, async () => {
     if (!bot) {
       return;
     }
-    let realOffline = true;
     for (let i = 0; i < 5; i++) {
       await sleep(5000);
       if (bot.isOnline()) {
-        realOffline = false;
+        return;
       }
     }
-    if (realOffline) {
-      bots[index] = undefined;
-    }
+    bots[index] = undefined;
   });
   if (bots.filter((client) => client !== undefined).length === 0) {
     throw new Error("没有可用机器人");
@@ -74,7 +71,7 @@ async function loginAllAccount(
 
 //登陆
 async function login() {
-  const activeAccount = await getActiveAccount();
+  const activeAccount = await findActiveAccount();
   await loginAllAccount(activeAccount);
 }
 

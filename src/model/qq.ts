@@ -22,8 +22,15 @@ class QQ extends BaseEntity {
   active: boolean;
 }
 
-async function getActiveAccount() {
+function findActiveAccount() {
   return QQ.find({ where: { active: true }, order: { order: "ASC" } });
 }
 
-export { QQ, getActiveAccount };
+async function addAccount(uin: number, password: string) {
+  const qq = new QQ();
+  qq.uin = uin;
+  qq.password = password;
+  await qq.save().catch((_) => undefined);
+}
+
+export { QQ, addAccount, findActiveAccount };

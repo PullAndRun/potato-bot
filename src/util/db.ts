@@ -1,6 +1,6 @@
 import dbConf from "@potato/config/db.json";
 import { DataSource } from "typeorm";
-import { logger } from "./logger.js";
+import { logger } from "./logger.ts";
 
 const dataSource = new DataSource({
   type: "postgres",
