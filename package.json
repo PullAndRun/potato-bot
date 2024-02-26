@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "potato-bot",
   "scripts": {
-    "bot": "node --loader ts-node/esm --no-warnings app/main.ts"
+    "bot": "ts-node app/main.ts"
   },
   "license": "GPL-3.0",
   "dependencies": {
@@ -12,6 +12,7 @@
     "@potato/config": "file:config",
     "consola": "^3.2.3",
     "dayjs": "^1.11.10",
+    "decache": "^4.6.2",
     "node-schedule": "^2.1.1",
     "pg": "^8.11.3",
     "ts-node": "^10.9.2",

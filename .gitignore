@@ -6,4 +6,4 @@
 /lib/ffmpeg
 /log
 /doc/private
-test.*
+test*.*
