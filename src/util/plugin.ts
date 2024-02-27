@@ -29,7 +29,7 @@ function reload(fileName: string) {
 
 //使用bot插件名 聊天内容的文本格式获取插件
 function pick(message: string) {
-  const pickPluginPaths = pluginPaths
+  const pickPluginPath = pluginPaths
     .filter((pluginPath) =>
       message
         .replaceAll(" ", "")
@@ -42,10 +42,13 @@ function pick(message: string) {
       const nextPluginName = require.cache[next]?.exports.info.name;
       return nextPluginName.length - prevPluginName.length;
     })[0];
-  if (!pickPluginPaths) {
+  if (!pickPluginPath) {
     return undefined;
   }
-  return require.cache[pickPluginPaths]?.exports.plugin;
+  return {
+    info: require.cache[pickPluginPath]?.exports.info,
+    plugin: require.cache[pickPluginPath]?.exports.plugin,
+  };
 }
 
 async function init() {

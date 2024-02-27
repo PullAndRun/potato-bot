@@ -23,13 +23,13 @@ class Plugin extends BaseEntity {
 }
 
 function findPlugin(gid: number, name: string) {
-  return Plugin.findBy({
+  return Plugin.findOneBy({
     gid: gid,
     name: name,
   });
 }
 
-async function addPlugin(gid: number, name: string, active: boolean = true) {
+async function addPlugin(gid: number, name: string, active: boolean) {
   const plugin = new Plugin();
   plugin.gid = gid;
   plugin.name = name;

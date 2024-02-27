@@ -4,7 +4,4 @@ import { addPlugin } from "@potato/bot/model/plugin";
 
 async function use() {
   await db.init();
-  await addPlugin(123, "shits");
 }
-
-use();
