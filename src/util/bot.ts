@@ -126,13 +126,13 @@ function masterBotListener() {
       return;
     }
     //数据库查询插件状态
-    const findPlugin = await pluginModel.findPlugin(
+    const findPlugin = await pluginModel.findOne(
       event.group_id,
       pickPlugin?.info.name
     );
     //插件没注册就注册
     if (!findPlugin) {
-      await pluginModel.addPlugin(
+      await pluginModel.add(
         event.group_id,
         pickPlugin.info.name,
         pickPlugin.info.defaultActive
@@ -180,6 +180,13 @@ function listener() {
   });
 }
 
+function msgNoCmd(msg: string, info: { name: string }) {
+  return msg.replace(
+    new RegExp(`(^\\s*${botConf.trigger}\\s*${info.name}\\s*)|(\\s*$)`, "g"),
+    ""
+  );
+}
+
 //初始化bot，登陆所有QQ账户
 async function init() {
   await login();
@@ -188,4 +195,4 @@ async function init() {
   listener();
 }
 
-export { getBots, init };
+export { getBots, init, msgNoCmd, sendGroupMsg };

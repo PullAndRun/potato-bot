@@ -26,11 +26,18 @@ function findActiveAccount() {
   return QQ.find({ where: { active: true }, order: { order: "ASC" } });
 }
 
-async function addAccount(uin: number, password: string) {
+async function add(
+  uin: number,
+  password: string,
+  order: number,
+  active: boolean
+) {
   const qq = new QQ();
   qq.uin = uin;
   qq.password = password;
+  qq.order = order;
+  qq.active = active;
   await qq.save().catch((_) => undefined);
 }
 
-export { QQ, addAccount, findActiveAccount };
+export { QQ, add, findActiveAccount };
