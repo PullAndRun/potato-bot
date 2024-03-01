@@ -8,6 +8,7 @@ import * as pluginUtil from "@potato/bot/util/plugin.ts";
 import botConf from "@potato/config/bot.json";
 import consola from "consola";
 import schedule from "node-schedule";
+import * as groupModel from "../model/group.ts";
 import * as pluginModel from "../model/plugin.ts";
 import { findActiveAccount } from "../model/qq.ts";
 import { logger } from "./logger.ts";
@@ -17,32 +18,32 @@ const bots: Array<Client | undefined> = [];
 let masterBotUin: number | undefined = undefined;
 
 //启动30秒后每5分钟检测一次bot是否在线
-// schedule.scheduleJob(`0 */5 * * * *`, async () => {
-//   console.log("fuck");
-//   await sleep(30000);
-//   bots.forEach(async (bot, index) => {
-//     if (!bot) {
-//       return;
-//     }
-//     //如果bot掉线
-//     for (let i = 0; i < 5; i++) {
-//       await sleep(5000);
-//       if (bot.isOnline()) {
-//         return;
-//       }
-//     }
-//     //移除bot
-//     bots[index] = undefined;
-//     //如果移除的bot是主bot，重新注册主bot
-//     if (bot.uin === masterBotUin) {
-//       masterBotListener();
-//     }
-//   });
-//   //如果没有可用bot，程序退出
-//   if (bots.filter((client) => client !== undefined).length === 0) {
-//     throw new Error("没有可用机器人");
-//   }
-// });
+schedule.scheduleJob(`0 */5 * * * *`, async () => {
+  console.log("fuck");
+  await sleep(30000);
+  bots.forEach(async (bot, index) => {
+    if (!bot) {
+      return;
+    }
+    //如果bot掉线
+    for (let i = 0; i < 5; i++) {
+      await sleep(5000);
+      if (bot.isOnline()) {
+        return;
+      }
+    }
+    //移除bot
+    bots[index] = undefined;
+    //如果移除的bot是主bot，重新注册主bot
+    if (bot.uin === masterBotUin) {
+      masterBotListener();
+    }
+  });
+  //如果没有可用bot，程序退出
+  if (bots.filter((client) => client !== undefined).length === 0) {
+    throw new Error("没有可用机器人");
+  }
+});
 
 //登陆一个QQ账户
 async function loginOneAccount(uin: number, password: string, order: number) {
@@ -165,11 +166,18 @@ function masterBotListener() {
 //监听器
 function listener() {
   getBots().forEach((bot) => {
+    bot.on("system.online", async (event) => {
+      const uins = bot.getGroupList();
+      for (const [uin] of uins) {
+        await groupModel.findOrAddOne(uin);
+      }
+    });
     //自动接受邀请入群
     bot.on("request.group.invite", async (event) => {
       await event.approve(true);
       await sleep(5000);
       await bot.reloadGroupList();
+      await groupModel.findOrAddOne(event.group_id);
     });
     //管理员退群，机器人退群
     bot.on("notice.group.decrease", async (event) => {
@@ -178,6 +186,7 @@ function listener() {
           await bot.setGroupLeave(event.group_id);
           await sleep(5000);
           await bot.reloadGroupList();
+          await groupModel.updateDisableGroup(event.group_id);
           logger.warn(
             `\n警告：机器人账号 ${bot.uin} 退出了群 ${event.group_id}`
           );
@@ -187,6 +196,7 @@ function listener() {
   });
 }
 
+//去掉消息开头的某些字符
 function msgNoCmd(msg: string, cmd: string[]) {
   return cmd.reduce(
     (acc, cur) =>
@@ -205,4 +215,4 @@ async function init() {
   listener();
 }
 
-export { getBots, init, msgNoCmd, sendGroupMsg, replyGroupMsg };
+export { getBots, init, msgNoCmd, replyGroupMsg, sendGroupMsg };

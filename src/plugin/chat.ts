@@ -1,4 +1,5 @@
 import { GroupMessageEvent } from "@icqqjs/icqq";
+import botConf from "@potato/config/bot.json";
 import aiConf from "@potato/config/openai.json";
 import { OpenAI } from "openai";
 import { ChatCompletionMessageParam } from "openai/resources";
@@ -6,7 +7,6 @@ import * as aiModel from "../model/ai";
 import * as groupModel from "../model/group";
 import { msgNoCmd, replyGroupMsg } from "../util/bot";
 import { logger } from "../util/logger";
-import botConf from "@potato/config/bot.json";
 
 const info = {
   name: "",
@@ -23,8 +23,11 @@ const openai = new OpenAI({
 //bot聊天内容
 async function plugin(event: GroupMessageEvent) {
   const msg = msgNoCmd(event.raw_message, [botConf.trigger, info.name]);
-  const group = await groupModel.findOrAddOne(event.group_id);
-  if (!group.customPrompt) {
+  const group = await groupModel.findOne(event.group_id);
+  if (group === null) {
+    return;
+  }
+  if (group.promptName !== "自定义") {
     const commonPrompt = await aiModel.findOne(group.promptName);
     if (!commonPrompt) {
       await replyGroupMsg(event, [await createChat(msg)], true);
