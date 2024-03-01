@@ -29,12 +29,20 @@ function findOne(gid: number, name: string) {
   });
 }
 
+async function findOrAddOne(gid: number, name: string, active: boolean) {
+  const plugin = await findOne(gid, name);
+  if (plugin === null) {
+    return add(gid, name, active);
+  }
+  return plugin;
+}
+
 async function add(gid: number, name: string, active: boolean) {
   const plugin = new Plugin();
   plugin.gid = gid;
   plugin.name = name;
   plugin.active = active;
-  await plugin.save().catch((_) => undefined);
+  return plugin.save().catch((_) => undefined);
 }
 
 async function update(gid: number, name: string, active: boolean) {
@@ -43,10 +51,10 @@ async function update(gid: number, name: string, active: boolean) {
     name: name,
   });
   if (plugin === null) {
-    return add(gid, name, active).catch((_) => undefined);
+    return undefined;
   }
   plugin.active = active;
-  await plugin.save().catch((_) => undefined);
+  return plugin.save().catch((_) => undefined);
 }
 
-export { Plugin, findOne, add, update };
+export { Plugin, findOne, add, update, findOrAddOne };

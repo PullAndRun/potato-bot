@@ -22,20 +22,23 @@ function reload(fileName: string) {
   decache(pluginPath);
   try {
     require(pluginPath);
+    return fileName;
   } catch (e) {
     logger.error(`\n错误：载入插件失败\n插件名：${fileName}\n错误：${e}`);
+    return undefined;
   }
 }
 
 //使用bot插件名 聊天内容的文本格式获取插件
 function pick(message: string) {
   const pickPluginPath = pluginPaths
-    .filter((pluginPath) =>
-      message
-        .replaceAll(" ", "")
-        .startsWith(
-          botConf.trigger + require.cache[pluginPath]?.exports.info.name
-        )
+    .filter(
+      (pluginPath) =>
+        message
+          .replaceAll(" ", "")
+          .startsWith(
+            botConf.trigger + require.cache[pluginPath]?.exports.info.name
+          ) && require.cache[pluginPath]?.exports.info.type === "plugin"
     )
     .sort((prev, next) => {
       const prevPluginName = require.cache[prev]?.exports.info.name;
@@ -45,10 +48,7 @@ function pick(message: string) {
   if (!pickPluginPath) {
     return undefined;
   }
-  return {
-    info: require.cache[pickPluginPath]?.exports.info,
-    plugin: require.cache[pickPluginPath]?.exports.plugin,
-  };
+  return require.cache[pickPluginPath]?.exports.info;
 }
 
 async function init() {

@@ -22,7 +22,11 @@ class Group extends BaseEntity {
 }
 
 async function findOne(gid: number) {
-  const group = await Group.findOneBy({ gid: gid });
+  return Group.findOneBy({ gid: gid });
+}
+
+async function findOrAddOne(gid: number) {
+  const group = await findOne(gid);
   if (group === null) {
     return add(gid);
   }
@@ -36,4 +40,4 @@ async function add(gid: number) {
   return group;
 }
 
-export { Group, findOne, add };
+export { Group, findOne, add, findOrAddOne };

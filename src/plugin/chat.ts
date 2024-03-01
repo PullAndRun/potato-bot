@@ -4,12 +4,15 @@ import { OpenAI } from "openai";
 import { ChatCompletionMessageParam } from "openai/resources";
 import * as aiModel from "../model/ai";
 import * as groupModel from "../model/group";
-import { msgNoCmd } from "../util/bot";
+import { msgNoCmd, replyGroupMsg } from "../util/bot";
 import { logger } from "../util/logger";
+import botConf from "@potato/config/bot.json";
 
 const info = {
   name: "",
+  type: "plugin",
   defaultActive: true,
+  plugin: plugin,
 };
 
 const openai = new OpenAI({
@@ -17,19 +20,24 @@ const openai = new OpenAI({
   baseURL: aiConf.account.baseURL,
 });
 
+//bot聊天内容
 async function plugin(event: GroupMessageEvent) {
-  const msg = msgNoCmd(event.raw_message, info);
-  const group = await groupModel.findOne(event.group_id);
+  const msg = msgNoCmd(event.raw_message, [botConf.trigger, info.name]);
+  const group = await groupModel.findOrAddOne(event.group_id);
   if (!group.customPrompt) {
     const commonPrompt = await aiModel.findOne(group.promptName);
     if (!commonPrompt) {
-      event.reply([await createChat(msg)], true);
+      await replyGroupMsg(event, [await createChat(msg)], true);
       return;
     }
-    event.reply([await createChat(msg, commonPrompt.prompt)], true);
+    await replyGroupMsg(
+      event,
+      [await createChat(msg, commonPrompt.prompt)],
+      true
+    );
     return;
   }
-  await event.reply([await createChat(msg, group.customPrompt)], true);
+  await replyGroupMsg(event, [await createChat(msg, group.customPrompt)], true);
 }
 
 async function createChat(msg: string, prompt: string | undefined = undefined) {
@@ -71,4 +79,4 @@ async function chat(msg: ChatCompletionMessageParam[]) {
   return response.replace(/^(\n+)/g, "").replace(/\n+/g, "\n");
 }
 
-export { info, plugin };
+export { info };

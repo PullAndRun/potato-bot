@@ -1,4 +1,9 @@
-import { Client, Sendable, createClient } from "@icqqjs/icqq";
+import {
+  Client,
+  GroupMessageEvent,
+  Sendable,
+  createClient,
+} from "@icqqjs/icqq";
 import * as pluginUtil from "@potato/bot/util/plugin.ts";
 import botConf from "@potato/config/bot.json";
 import consola from "consola";
@@ -12,31 +17,32 @@ const bots: Array<Client | undefined> = [];
 let masterBotUin: number | undefined = undefined;
 
 //启动30秒后每5分钟检测一次bot是否在线
-schedule.scheduleJob(`0 */5 * * * *`, async () => {
-  await sleep(30000);
-  bots.forEach(async (bot, index) => {
-    if (!bot) {
-      return;
-    }
-    //如果bot掉线
-    for (let i = 0; i < 5; i++) {
-      await sleep(5000);
-      if (bot.isOnline()) {
-        return;
-      }
-    }
-    //移除bot
-    bots[index] = undefined;
-    //如果移除的bot是主bot，重新注册主bot
-    if (bot.uin === masterBotUin) {
-      masterBotListener();
-    }
-  });
-  //如果没有可用bot，程序退出
-  if (bots.filter((client) => client !== undefined).length === 0) {
-    throw new Error("没有可用机器人");
-  }
-});
+// schedule.scheduleJob(`0 */5 * * * *`, async () => {
+//   console.log("fuck");
+//   await sleep(30000);
+//   bots.forEach(async (bot, index) => {
+//     if (!bot) {
+//       return;
+//     }
+//     //如果bot掉线
+//     for (let i = 0; i < 5; i++) {
+//       await sleep(5000);
+//       if (bot.isOnline()) {
+//         return;
+//       }
+//     }
+//     //移除bot
+//     bots[index] = undefined;
+//     //如果移除的bot是主bot，重新注册主bot
+//     if (bot.uin === masterBotUin) {
+//       masterBotListener();
+//     }
+//   });
+//   //如果没有可用bot，程序退出
+//   if (bots.filter((client) => client !== undefined).length === 0) {
+//     throw new Error("没有可用机器人");
+//   }
+// });
 
 //登陆一个QQ账户
 async function loginOneAccount(uin: number, password: string, order: number) {
@@ -102,8 +108,19 @@ async function sendGroupMsg(
   if (client === undefined) {
     return;
   }
-  client.sendGroupMsg(gid, message).catch((e) => {
+  return client.sendGroupMsg(gid, message).catch((e) => {
     logger.error(`\n错误：群消息发送失败\n消息内容：${message}`);
+  });
+}
+
+//回复群消息
+async function replyGroupMsg(
+  event: GroupMessageEvent,
+  message: Sendable,
+  quote: boolean = false
+) {
+  return event.reply(message, quote).catch((e) => {
+    logger.error(`\n错误：群消息回复失败\n消息内容：${message}`);
   });
 }
 
@@ -125,28 +142,18 @@ function masterBotListener() {
     if (!pickPlugin) {
       return;
     }
-    //数据库查询插件状态
-    const findPlugin = await pluginModel.findOne(
+    //数据库查询插件状态，没查询到就注册插件
+    const findPlugin = await pluginModel.findOrAddOne(
       event.group_id,
-      pickPlugin?.info.name
+      pickPlugin.name,
+      pickPlugin.defaultActive
     );
-    //插件没注册就注册
-    if (!findPlugin) {
-      await pluginModel.add(
-        event.group_id,
-        pickPlugin.info.name,
-        pickPlugin.info.defaultActive
-      );
-    }
-    //插件没激活，或者没注册过但是默认不激活，就返回
-    if (
-      (findPlugin && !findPlugin.active) ||
-      (!findPlugin && !pickPlugin.info.defaultActive)
-    ) {
-      sendGroupMsg(
+    //插件没激活或注册失败就返回
+    if (findPlugin && !findPlugin.active) {
+      await sendGroupMsg(
         getBots()[0],
         event.group_id,
-        `错误：${pickPlugin.info.name}功能未激活，联系管理员激活。`
+        `错误：${pickPlugin.name}功能未激活，联系管理员激活。`
       );
       return;
     }
@@ -180,10 +187,13 @@ function listener() {
   });
 }
 
-function msgNoCmd(msg: string, info: { name: string }) {
-  return msg.replace(
-    new RegExp(`(^\\s*${botConf.trigger}\\s*${info.name}\\s*)|(\\s*$)`, "g"),
-    ""
+function msgNoCmd(msg: string, cmd: string[]) {
+  return cmd.reduce(
+    (acc, cur) =>
+      acc
+        .replace(new RegExp(`(^\\s*${cur}\\s*)|(\\s*$)`, "g"), "")
+        .replace(/\s+/g, " "),
+    msg
   );
 }
 
@@ -195,4 +205,4 @@ async function init() {
   listener();
 }
 
-export { getBots, init, msgNoCmd, sendGroupMsg };
+export { getBots, init, msgNoCmd, sendGroupMsg, replyGroupMsg };
