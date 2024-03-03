@@ -56,18 +56,6 @@ async function plugin(event: GroupMessageEvent) {
       plugin: restorePromptName,
     },
   ];
-  if (msg === "") {
-    const reply = secondCmd
-      .map(
-        (cmd) =>
-          `功能：${cmd.name}\n说明：${cmd.comment}\n需要群管权限:${
-            cmd.auth ? "是" : "否"
-          }`
-      )
-      .join("\n");
-    await replyGroupMsg(event, [reply], true);
-    return;
-  }
   for (const cmd of secondCmd) {
     if (!msg.startsWith(cmd.name)) {
       continue;
@@ -84,8 +72,17 @@ async function plugin(event: GroupMessageEvent) {
       break;
     }
     cmd.plugin(cmd.name, event);
-    break;
+    return;
   }
+  const intro = secondCmd
+    .map(
+      (cmd) =>
+        `功能：${cmd.name}\n说明：${cmd.comment}\n需要群管权限:${
+          cmd.auth ? "是" : "否"
+        }`
+    )
+    .join("\n\n");
+  await replyGroupMsg(event, [intro], true);
 }
 
 //bot设置 插件状态
@@ -108,9 +105,9 @@ async function pluginState(message: string, event: GroupMessageEvent) {
         .filter((v) => v.name !== "")
         .map(
           (curr) =>
-            `插件名：${curr.name}\n状态：${curr.active ? "开启" : "关闭"}\n`
+            `插件名：${curr.name}\n状态：${curr.active ? "开启" : "关闭"}`
         )
-        .join("\n"),
+        .join("\n\n"),
     ],
     true
   );
@@ -135,7 +132,7 @@ async function setPromptName(message: string, event: GroupMessageEvent) {
   if (msg === "") {
     await replyGroupMsg(
       event,
-      [`命令错误。请使用“${botConf.trigger}设置”命令获取命令正确使用方式。`],
+      [`命令错误。请使用“${botConf.trigger}设置”获取命令的正确使用方式。`],
       true
     );
     return;
@@ -165,7 +162,7 @@ async function setPrompt(message: string, event: GroupMessageEvent) {
   if (msg === "") {
     await replyGroupMsg(
       event,
-      [`命令错误。请使用“${botConf.trigger}设置”命令获取命令正确使用方式。`],
+      [`命令错误。请使用“${botConf.trigger}设置”获取命令的正确使用方式。`],
       true
     );
     return;
@@ -184,7 +181,7 @@ async function active(message: string, event: GroupMessageEvent) {
   if (msg.length === 0) {
     await replyGroupMsg(
       event,
-      [`命令错误。请使用“${botConf.trigger}设置”命令获取命令正确使用方式。`],
+      [`命令错误。请使用“${botConf.trigger}设置”获取命令的正确使用方式。`],
       true
     );
     return;
@@ -209,7 +206,7 @@ async function disable(message: string, event: GroupMessageEvent) {
   if (msg.length === 0) {
     await replyGroupMsg(
       event,
-      [`命令错误。请使用“${botConf.trigger}设置”命令获取命令正确使用方式。`],
+      [`命令错误。请使用“${botConf.trigger}设置”获取命令的正确使用方式。`],
       true
     );
     return;
@@ -233,7 +230,7 @@ async function pluginSwitch(
   group_id: number,
   active: boolean
 ) {
-  const switchedPluginNames = await Promise.all(
+  return Promise.all(
     pluginNames.map(async (pluginName) => {
       const updateResult = await pluginModel.update(
         group_id,
@@ -245,10 +242,7 @@ async function pluginSwitch(
       }
       return pluginName;
     })
-  );
-  return switchedPluginNames.filter(
-    (name): name is string => name !== undefined
-  );
+  ).then((names) => names.filter((name): name is string => name !== undefined));
 }
 
 export { info };

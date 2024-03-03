@@ -17,7 +17,7 @@ async function plugin(event: GroupMessageEvent) {
     [
       pickAll()
         .map((plugin) => plugin.comment.join("\n"))
-        .join("\n"),
+        .join("\n\n"),
     ],
     true
   );
