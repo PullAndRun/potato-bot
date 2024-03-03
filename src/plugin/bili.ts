@@ -1,11 +1,14 @@
 import { GroupMessageEvent } from "@icqqjs/icqq";
 import * as biliModel from "@potato/bot/model/bili.ts";
+import * as pluginModel from "@potato/bot/model/plugin.ts";
 import biliConf from "@potato/config/bili.json";
 import botConf from "@potato/config/bot.json";
 import * as cheerio from "cheerio";
+import dayjs from "dayjs";
 import { XMLParser } from "fast-xml-parser";
+import schedule from "node-schedule";
 import { z } from "zod";
-import { msgNoCmd, replyGroupMsg } from "../util/bot";
+import { getBots, msgNoCmd, replyGroupMsg, sendGroupMsg } from "../util/bot";
 import { createFetch } from "./http";
 
 const info = {
@@ -17,6 +20,38 @@ const info = {
   ],
   plugin: plugin,
 };
+
+schedule.scheduleJob(`0 */5 * * * *`, async () => {
+  const biliFindAll = await biliModel.findAll();
+  biliFindAll.forEach(async (bili) => {
+    const pluginState = await pluginModel.findOne(bili.gid, "订阅");
+    if (pluginState === null) {
+      return;
+    }
+    const live = await findLive(bili.rid);
+    const dynamic = await findDynamic(bili.mid);
+    if (
+      live !== undefined &&
+      dayjs().subtract(5, "minute").isBefore(dayjs(live.pubDate))
+    ) {
+      await sendGroupMsg(getBots()[0], bili.gid, [
+        `【${bili.name}】正在直播！\n`,
+        `标题：${live.title}\n`,
+        `传送门：${live.link}`,
+      ]);
+    }
+    if (
+      dynamic &&
+      dayjs().subtract(5, "minute").isBefore(dayjs(dynamic.pubDate))
+    ) {
+      await sendGroupMsg(getBots()[0], bili.gid, [
+        `【${bili.name}】 有新动态！\n`,
+        `动态：${dynamic.description}\n`,
+        `传送门：${dynamic.link}`,
+      ]);
+    }
+  });
+});
 
 async function plugin(event: GroupMessageEvent) {
   const msg = msgNoCmd(event.raw_message, [botConf.trigger, info.name]);
@@ -190,7 +225,7 @@ async function findUser(userName: string) {
   return userParse.data.data.result[0];
 }
 
-async function findRoom(room_id: number) {
+async function findLive(room_id: number) {
   const roomInfo = await createFetch(
     `${biliConf.api.live}${room_id}`,
     5000
@@ -217,7 +252,11 @@ async function findRoom(room_id: number) {
   if (!roomParse.success) {
     return undefined;
   }
-  return roomParse.data.rss.channel.item;
+  const liveResult = roomParse.data.rss.channel.item;
+  return {
+    ...liveResult,
+    title: liveResult.title.split(" ")[0],
+  };
 }
 
 async function findDynamic(mid: number) {

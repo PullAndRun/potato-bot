@@ -18,31 +18,31 @@ const bots: Array<Client | undefined> = [];
 let masterBotUin: number | undefined = undefined;
 
 //启动30秒后每5分钟检测一次bot是否在线
-// schedule.scheduleJob(`0 */5 * * * *`, async () => {
-//   await sleep(30000);
-//   bots.forEach(async (bot, index) => {
-//     if (!bot) {
-//       return;
-//     }
-//     //如果bot掉线
-//     for (let i = 0; i < 5; i++) {
-//       await sleep(5000);
-//       if (bot.isOnline()) {
-//         return;
-//       }
-//     }
-//     //移除bot
-//     bots[index] = undefined;
-//     //如果移除的bot是主bot，重新注册主bot
-//     if (bot.uin === masterBotUin) {
-//       masterBotListener();
-//     }
-//   });
-//   //如果没有可用bot，程序退出
-//   if (bots.filter((client) => client !== undefined).length === 0) {
-//     throw new Error("没有可用机器人");
-//   }
-// });
+schedule.scheduleJob(`0 */5 * * * *`, async () => {
+  await sleep(30000);
+  bots.forEach(async (bot, index) => {
+    if (!bot) {
+      return;
+    }
+    //如果bot掉线
+    for (let i = 0; i < 5; i++) {
+      await sleep(5000);
+      if (bot.isOnline()) {
+        return;
+      }
+    }
+    //移除bot
+    bots[index] = undefined;
+    //如果移除的bot是主bot，重新注册主bot
+    if (bot.uin === masterBotUin) {
+      masterBotListener();
+    }
+  });
+  //如果没有可用bot，程序退出
+  if (bots.filter((client) => client !== undefined).length === 0) {
+    throw new Error("没有可用机器人");
+  }
+});
 
 //登陆一个QQ账户
 async function loginOneAccount(uin: number, password: string, order: number) {
