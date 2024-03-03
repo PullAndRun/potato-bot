@@ -9,7 +9,7 @@ import { XMLParser } from "fast-xml-parser";
 import schedule from "node-schedule";
 import { z } from "zod";
 import { getBots, msgNoCmd, replyGroupMsg, sendGroupMsg } from "../util/bot";
-import { createFetch } from "./http";
+import { createFetch } from "../util/http";
 
 const info = {
   name: "订阅",
