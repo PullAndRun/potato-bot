@@ -12,6 +12,9 @@ const info = {
   name: "",
   type: "plugin",
   defaultActive: true,
+  comment: [
+    `${botConf.trigger}聊天内容\n说明：AI聊天，内置多种人格，使用“${botConf.trigger}设置”了解如何变更AI人格。`,
+  ],
   plugin: plugin,
 };
 
@@ -27,12 +30,16 @@ async function plugin(event: GroupMessageEvent) {
   if (group === null) {
     return;
   }
-  if (group.promptName !== "自定义") {
-    const commonPrompt = await aiModel.findOne(group.promptName);
-    if (!commonPrompt) {
-      await replyGroupMsg(event, [await createChat(msg)], true);
-      return;
-    }
+  if (group.promptName === "自定义") {
+    await replyGroupMsg(
+      event,
+      [await createChat(msg, group.customPrompt)],
+      true
+    );
+    return;
+  }
+  const commonPrompt = await aiModel.findOne(group.promptName);
+  if (commonPrompt) {
     await replyGroupMsg(
       event,
       [await createChat(msg, commonPrompt.prompt)],
@@ -40,7 +47,7 @@ async function plugin(event: GroupMessageEvent) {
     );
     return;
   }
-  await replyGroupMsg(event, [await createChat(msg, group.customPrompt)], true);
+  await replyGroupMsg(event, [await createChat(msg)], true);
 }
 
 async function createChat(msg: string, prompt: string | undefined = undefined) {
@@ -50,7 +57,7 @@ async function createChat(msg: string, prompt: string | undefined = undefined) {
   if (!prompt) {
     const catAi = await aiModel.findOne("猫娘");
     if (!catAi) {
-      return "没找到任何prompt，请管理员检查数据库。";
+      return "未查询到默认prompts，请联系管理员。";
     }
     gptMessages.unshift({ role: "system", content: catAi.prompt });
     return chat(gptMessages);
@@ -74,10 +81,10 @@ async function chat(msg: ChatCompletionMessageParam[]) {
     .then((chatCompletion) => chatCompletion.choices[0]?.message.content)
     .catch((e) => {
       logger.error(`\n错误：ai聊天错误\n聊天内容：${msg}\n错误信息：${e}`);
-      return "ai系统异常，请稍后再试。";
+      return "AI系统异常，请稍后再试。";
     });
   if (!response) {
-    return "ai系统异常，请重试。";
+    return "AI系统异常，请重试。";
   }
   return response.replace(/^(\n+)/g, "").replace(/\n+/g, "\n");
 }

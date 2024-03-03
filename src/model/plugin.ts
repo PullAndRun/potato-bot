@@ -15,11 +15,15 @@ class Plugin extends BaseEntity {
   @Column({ type: "float", comment: "qq群号" })
   gid: number;
 
-  @Column({ type: "text", comment: "插件名" })
+  @Column({ type: "text", comment: "中文的插件名" })
   name: string;
 
   @Column({ type: "boolean", comment: "是否启用插件", default: true })
   active: boolean;
+}
+
+function findByGid(gid: number) {
+  return Plugin.findBy({ gid: gid });
 }
 
 function findOne(gid: number, name: string) {
@@ -57,4 +61,4 @@ async function update(gid: number, name: string, active: boolean) {
   return plugin.save().catch((_) => undefined);
 }
 
-export { Plugin, findOne, add, update, findOrAddOne };
+export { Plugin, add, findByGid, findOne, findOrAddOne, update };

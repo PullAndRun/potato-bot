@@ -51,8 +51,15 @@ function pick(message: string) {
   return require.cache[pickPluginPath]?.exports.info;
 }
 
+//获取所有插件的info
+function pickAll() {
+  return pluginPaths.map(
+    (pluginPath) => require.cache[pluginPath]?.exports.info
+  );
+}
+
 async function init() {
   await load();
 }
 
-export { init, load, pick, reload };
+export { init, load, pick, pickAll, reload };

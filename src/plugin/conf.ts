@@ -9,6 +9,9 @@ const info = {
   name: "设置",
   type: "plugin",
   defaultActive: true,
+  comment: [
+    `${botConf.trigger}设置\n说明：设置机器人各项功能，使用“${botConf.trigger}设置”命令查询有关“设置”的详细信息。`,
+  ],
   plugin: plugin,
 };
 
@@ -18,32 +21,38 @@ async function plugin(event: GroupMessageEvent) {
   const secondCmd = [
     {
       name: "开启插件",
-      comment: `功能：开启插件\n使用方式：${botConf.trigger}设置 开启插件 插件1 插件2`,
+      comment: `使用“${botConf.trigger}设置 开启插件 插件名“命令开启插件\n插件名源自“${botConf.trigger}帮助”命令`,
       auth: true,
       plugin: active,
     },
     {
       name: "关闭插件",
-      comment: `功能：关闭插件\n使用方式：${botConf.trigger}设置 关闭插件 插件1 插件2`,
+      comment: `使用“${botConf.trigger}设置 开启插件 插件名“命令关闭插件\n插件名源自“${botConf.trigger}帮助”命令`,
       auth: true,
       plugin: disable,
     },
     {
+      name: "插件状态",
+      comment: `使用“${botConf.trigger}设置 插件状态“命令查询目前插件状态`,
+      auth: false,
+      plugin: pluginState,
+    },
+    {
       name: "人格",
-      comment: `功能：切换群聊AI人格\n使用方式：${botConf.trigger}设置 人格 人格名\n获取人格名：${botConf.trigger}帮助 人格列表`,
+      comment: `使用“${botConf.trigger}设置 人格 人格名“命令切换聊天AI人格\n人格名源自“${botConf.trigger}帮助 AI人格”命令`,
       auth: false,
       plugin: setPromptName,
     },
     {
       name: "自定义人格",
       auth: true,
-      comment: `功能：切换群聊AI人格为自定义人格\n使用方式：${botConf.trigger}设置 自定义人格 人格内容`,
+      comment: `使用“${botConf.trigger}设置 自定义人格 人格prompts“命令设置聊天AI的自定义人格\n人格prompts是自定义的人格prompts`,
       plugin: setPrompt,
     },
     {
       name: "还原人格",
       auth: true,
-      comment: `功能：还原群聊AI人格为猫娘\n使用方式：${botConf.trigger}设置 还原人格`,
+      comment: `使用“${botConf.trigger}设置 还原人格“命令还原默认AI人格`,
       plugin: restorePromptName,
     },
   ];
@@ -51,7 +60,7 @@ async function plugin(event: GroupMessageEvent) {
     const reply = secondCmd
       .map(
         (cmd) =>
-          `${cmd.name}\n${cmd.comment}\n需要管理员权限:${
+          `功能：${cmd.name}\n说明：${cmd.comment}\n需要群管权限:${
             cmd.auth ? "是" : "否"
           }`
       )
@@ -79,17 +88,45 @@ async function plugin(event: GroupMessageEvent) {
   }
 }
 
+//bot设置 插件状态
+async function pluginState(message: string, event: GroupMessageEvent) {
+  const state = await pluginModel.findByGid(event.group_id);
+  if (state === null) {
+    await replyGroupMsg(
+      event,
+      [
+        `未查询到任何插件状态\n插件在您首次使用的时候自动初始化\n请您先使用插件\n使用“${botConf.trigger}帮助”命令查询可使用的插件`,
+      ],
+      true
+    );
+    return;
+  }
+  await replyGroupMsg(
+    event,
+    [
+      state
+        .filter((v) => v.name !== "")
+        .map(
+          (curr) =>
+            `插件名：${curr.name}\n状态：${curr.active ? "开启" : "关闭"}\n`
+        )
+        .join("\n"),
+    ],
+    true
+  );
+}
+
 //bot设置 还原人格
 async function restorePromptName(_: string, event: GroupMessageEvent) {
   const updateResult = await groupModel.updatePromptName(
     event.group_id,
     "猫娘"
   );
-  if (!updateResult) {
+  if (updateResult === undefined) {
     await replyGroupMsg(event, [`人格还原失败，请联系管理员。`], true);
     return;
   }
-  await replyGroupMsg(event, [`人格还原成功，请联系管理员。`], true);
+  await replyGroupMsg(event, [`人格切换为猫娘。`], true);
 }
 
 //bot设置 人格
@@ -98,9 +135,7 @@ async function setPromptName(message: string, event: GroupMessageEvent) {
   if (msg === "") {
     await replyGroupMsg(
       event,
-      [
-        `命令错误。\n设置群聊人格命令：\n${botConf.trigger}设置 人格 人格名\n人格名获取方式：${botConf.trigger}帮助 人格列表`,
-      ],
+      [`命令错误。请使用“${botConf.trigger}设置”命令获取命令正确使用方式。`],
       true
     );
     return;
@@ -109,17 +144,19 @@ async function setPromptName(message: string, event: GroupMessageEvent) {
   if (ai === null) {
     await replyGroupMsg(
       event,
-      [`未发现指定人格，请检查人格名是否正确。`],
+      [
+        `系统未录入您输入的人格，请使用“${botConf.trigger}帮助 AI人格”命令获取可用的AI人格。`,
+      ],
       true
     );
     return;
   }
   const updateResult = await groupModel.updatePromptName(event.group_id, msg);
   if (!updateResult) {
-    await replyGroupMsg(event, [`人格更新失败，请联系管理员。`], true);
+    await replyGroupMsg(event, [`AI人格更新失败，请联系群管理员。`], true);
     return;
   }
-  await replyGroupMsg(event, [`人格更新成功，请联系管理员。`], true);
+  await replyGroupMsg(event, [`AI人格变更为“${msg}”`], true);
 }
 
 //bot设置 自定义人格
@@ -128,19 +165,17 @@ async function setPrompt(message: string, event: GroupMessageEvent) {
   if (msg === "") {
     await replyGroupMsg(
       event,
-      [
-        `命令错误。\n自定义群聊人格命令：\n${botConf.trigger}设置 自定义人格 人格Prompt`,
-      ],
+      [`命令错误。请使用“${botConf.trigger}设置”命令获取命令正确使用方式。`],
       true
     );
     return;
   }
   const updateResult = await groupModel.updateCustomPrompt(event.group_id, msg);
   if (!updateResult) {
-    await replyGroupMsg(event, [`人格更新失败，请联系管理员。`], true);
+    await replyGroupMsg(event, [`AI人格更新失败，请联系管理员。`], true);
     return;
   }
-  await replyGroupMsg(event, [`人格更新成功，请联系管理员。`], true);
+  await replyGroupMsg(event, [`AI人格变更为您定义的prompts`], true);
 }
 
 //bot设置 开启
@@ -149,16 +184,20 @@ async function active(message: string, event: GroupMessageEvent) {
   if (msg.length === 0) {
     await replyGroupMsg(
       event,
-      [
-        `命令错误。\n开启插件命令：\n${botConf.trigger}设置 开启 插件名1 插件名2 ...`,
-      ],
+      [`命令错误。请使用“${botConf.trigger}设置”命令获取命令正确使用方式。`],
       true
     );
     return;
   }
   const activeResult = await pluginSwitch(msg, event.group_id, true);
   if (activeResult.length === 0) {
-    await replyGroupMsg(event, [`未搜索到需要开启的插件`], true);
+    await replyGroupMsg(
+      event,
+      [
+        `系统未录入您输入的插件名，请使用“${botConf.trigger}帮助“命令查询可启用的插件`,
+      ],
+      true
+    );
     return;
   }
   await replyGroupMsg(event, [`已开启插件：${activeResult.join(" ")}`], true);
@@ -170,16 +209,20 @@ async function disable(message: string, event: GroupMessageEvent) {
   if (msg.length === 0) {
     await replyGroupMsg(
       event,
-      [
-        `命令错误，关闭插件命令：\n${botConf.trigger}设置 关闭 插件名1 插件名2 ...`,
-      ],
+      [`命令错误。请使用“${botConf.trigger}设置”命令获取命令正确使用方式。`],
       true
     );
     return;
   }
   const activeResult = await pluginSwitch(msg, event.group_id, false);
   if (activeResult.length === 0) {
-    await replyGroupMsg(event, [`未搜索到需要关闭的插件`], true);
+    await replyGroupMsg(
+      event,
+      [
+        `系统未录入您输入的插件名，请使用“${botConf.trigger}帮助“命令查询可关闭的插件`,
+      ],
+      true
+    );
     return;
   }
   await replyGroupMsg(event, [`已关闭插件：${activeResult.join(" ")}`], true);
