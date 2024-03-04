@@ -56,6 +56,12 @@ async function plugin(event: GroupMessageEvent) {
       comment: `使用“${botConf.trigger}设置 还原人格“命令还原默认AI人格`,
       plugin: restorePromptName,
     },
+    {
+      name: "推送",
+      auth: true,
+      comment: `使用“${botConf.trigger}设置 推送“命令了解如何开关主动推送功能`,
+      plugin: push,
+    },
   ];
   for (const cmd of secondCmd) {
     if (!msg.startsWith(cmd.name)) {
@@ -72,18 +78,100 @@ async function plugin(event: GroupMessageEvent) {
       );
       break;
     }
-    cmd.plugin(cmd.name, event);
+    cmd.plugin(msg, event);
     return;
   }
   const intro = secondCmd
     .map(
       (cmd) =>
-        `功能：${cmd.name}\n说明：${cmd.comment}\n需要群管权限:${
-          cmd.auth ? "是" : "否"
-        }`
+        `指令：${botConf.trigger} ${info.name} ${cmd.name}\n说明：${
+          cmd.comment
+        }\n需要群管权限:${cmd.auth ? "是" : "否"}`
     )
     .join("\n\n");
   await replyGroupMsg(event, [intro], true);
+}
+
+//bot设置 推送
+async function push(message: string, event: GroupMessageEvent) {
+  const msg = msgNoCmd(message, ["推送"]);
+  const secondCmd = [
+    {
+      name: "新闻",
+      comment: `${botConf.trigger} 设置 推送 新闻 开启或关闭`,
+      plugin: pushSwitch,
+    },
+    {
+      name: "闲聊",
+      comment: `${botConf.trigger} 设置 推送 闲聊 开启或关闭`,
+      plugin: pushSwitch,
+    },
+  ];
+  for (const cmd of secondCmd) {
+    if (!msg.startsWith(cmd.name)) {
+      continue;
+    }
+    cmd.plugin(msg, cmd.name, event);
+    return;
+  }
+  const intro = secondCmd
+    .map(
+      (cmd) =>
+        `指令：${botConf.trigger} ${info.name} 推送 ${cmd.name}\n说明：${cmd.comment}\n需要群管权限:是`
+    )
+    .join("\n\n");
+  await replyGroupMsg(event, [intro], true);
+}
+
+async function pushSwitch(
+  message: string,
+  type: string,
+  event: GroupMessageEvent
+) {
+  const msg = msgNoCmd(message, [type]);
+  if (msg.startsWith("开启")) {
+    const news = await pluginModel.findOrAddOne(
+      event.group_id,
+      `${type}推送`,
+      false
+    );
+    if (news === undefined) {
+      await replyGroupMsg(
+        event,
+        [`开启群内${type}推送功能失败，请联系管理员。`],
+        true
+      );
+      return;
+    }
+    news.active = true;
+    await news.save();
+    await replyGroupMsg(event, [`您开启了群内${type}推送功能`], true);
+    return;
+  }
+  if (msg.startsWith("关闭")) {
+    const news = await pluginModel.findOrAddOne(
+      event.group_id,
+      `${type}推送`,
+      false
+    );
+    if (news === undefined) {
+      await replyGroupMsg(
+        event,
+        [`关闭群内${type}推送功能失败，请联系管理员。`],
+        true
+      );
+      return;
+    }
+    news.active = false;
+    await news.save();
+    await replyGroupMsg(event, [`您关闭了群内${type}推送功能`], true);
+    return;
+  }
+  await replyGroupMsg(
+    event,
+    [`命令错误。请使用“${botConf.trigger} 设置 推送”获取命令的正确使用方式。`],
+    true
+  );
 }
 
 //bot设置 插件状态

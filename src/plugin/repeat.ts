@@ -6,7 +6,7 @@ const info = {
   name: "复读",
   type: "plugin",
   defaultActive: true,
-  comment: [`说明：复读超过3次重复的群聊信息`],
+  comment: [`说明：复读重复3次的群聊文本消息`],
   plugin: plugin,
 };
 

@@ -1,20 +1,27 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  Index,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 
 @Entity()
+@Index(["gid", "mid", "rid"], { unique: true })
 class Bili extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: "text", unique: true, comment: "up主昵称" })
+  @Column({ type: "text", comment: "up主昵称" })
   name: string;
 
-  @Column({ type: "float", unique: true, comment: "群号" })
+  @Column({ type: "float", comment: "群号" })
   gid: number;
 
-  @Column({ type: "float", unique: true, comment: "up主用户id" })
+  @Column({ type: "float", comment: "up主用户id" })
   mid: number;
 
-  @Column({ type: "float", unique: true, comment: "up主直播间id" })
+  @Column({ type: "float", comment: "up主直播间id" })
   rid: number;
 }
 
