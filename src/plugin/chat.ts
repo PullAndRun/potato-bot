@@ -13,7 +13,8 @@ const info = {
   type: "plugin",
   defaultActive: true,
   comment: [
-    `${botConf.trigger}聊天内容\n说明：AI聊天，内置多种人格，使用“${botConf.trigger}设置”了解如何变更AI人格。`,
+    `说明：AI聊天，内置多种人格`,
+    `使用“${botConf.trigger}设置”了解如何变更AI人格。`,
   ],
   plugin: plugin,
 };

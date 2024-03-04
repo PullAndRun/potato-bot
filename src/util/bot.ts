@@ -200,7 +200,11 @@ function msgNoCmd(msg: string, cmd: string[]) {
   return cmd.reduce(
     (acc, cur) =>
       acc
-        .replace(new RegExp(`(^\\s*${cur}\\s*)|(\\s*$)`, "g"), "")
+        .replace(
+          new RegExp(`(^\\s*${cur}\\s*)|(\\s*$)|(\\[\\])|(\\[(.+?)\\])`, "g"),
+          ""
+        )
+        .replace(/(\r+)/g, "\r")
         .replace(/\s+/g, " "),
     msg
   );

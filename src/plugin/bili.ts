@@ -16,7 +16,8 @@ const info = {
   type: "plugin",
   defaultActive: true,
   comment: [
-    `${botConf.trigger}订阅\n说明：向群内推送b站up主的开播通知和动态\n使用“${botConf.trigger}订阅”了解如何订阅b站up主。`,
+    `说明：向群内推送b站up主的开播通知和动态`,
+    `使用“${botConf.trigger}订阅”了解如何订阅b站up主`,
   ],
   plugin: plugin,
 };

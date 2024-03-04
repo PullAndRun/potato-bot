@@ -10,7 +10,9 @@ const info = {
   type: "plugin",
   defaultActive: true,
   comment: [
-    `${botConf.trigger}点歌\n说明：点一首网易云音乐的歌\n使用“${botConf.trigger}点歌 歌曲名”点歌\n如果不输入歌曲名，就随机点一首歌`,
+    `说明：点一首网易云音乐的歌`,
+    `使用“${botConf.trigger}点歌 歌曲名或歌曲id”点歌`,
+    `如果不输入歌曲名，就随机点一首歌`,
   ],
   plugin: plugin,
 };

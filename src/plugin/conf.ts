@@ -10,7 +10,8 @@ const info = {
   type: "plugin",
   defaultActive: true,
   comment: [
-    `${botConf.trigger}设置\n说明：设置机器人各项功能，使用“${botConf.trigger}设置”命令查询有关“设置”的详细信息。`,
+    `说明：设置机器人各项功能`,
+    `使用“${botConf.trigger}设置”命令了解如何设置机器人`,
   ],
   plugin: plugin,
 };
