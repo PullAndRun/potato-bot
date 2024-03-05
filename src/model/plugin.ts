@@ -46,7 +46,8 @@ async function add(gid: number, name: string, active: boolean) {
   plugin.gid = gid;
   plugin.name = name;
   plugin.active = active;
-  return plugin.save().catch((_) => undefined);
+  plugin.save().catch((_) => undefined);
+  return plugin;
 }
 
 async function update(gid: number, name: string, active: boolean) {

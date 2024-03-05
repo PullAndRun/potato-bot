@@ -1,5 +1,7 @@
 import { GroupMessageEvent } from "@icqqjs/icqq";
-import { replyGroupMsg } from "../util/bot";
+import botConf from "@potato/config/bot.json";
+import { findAll } from "../model/ai";
+import { msgNoCmd, replyGroupMsg } from "../util/bot";
 import * as pluginModel from "../util/plugin";
 
 const info = {
@@ -11,6 +13,12 @@ const info = {
 };
 
 async function plugin(event: GroupMessageEvent) {
+  const msg = msgNoCmd(event.raw_message, [botConf.trigger, info.name]);
+  if (msg.startsWith("AI人格")) {
+    const prompt = await prompts();
+    await replyGroupMsg(event, [prompt], true);
+    return;
+  }
   await replyGroupMsg(
     event,
     [
@@ -27,6 +35,13 @@ async function plugin(event: GroupMessageEvent) {
     ],
     true
   );
+}
+
+async function prompts() {
+  const allPrompts = await findAll();
+  return allPrompts
+    .map((prompt, index) => `${index}、人格名：${prompt.promptName}`)
+    .join("\n");
 }
 
 export { info };

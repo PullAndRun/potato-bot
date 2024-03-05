@@ -38,6 +38,7 @@ async function add(
   qq.order = order;
   qq.active = active;
   await qq.save().catch((_) => undefined);
+  return qq;
 }
 
 export { QQ, add, findActiveAccount };

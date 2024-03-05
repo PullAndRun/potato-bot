@@ -8,7 +8,13 @@ import dayjs from "dayjs";
 import { XMLParser } from "fast-xml-parser";
 import schedule from "node-schedule";
 import { z } from "zod";
-import { getBots, msgNoCmd, replyGroupMsg, sendGroupMsg } from "../util/bot";
+import {
+  getBots,
+  groupInfo,
+  msgNoCmd,
+  replyGroupMsg,
+  sendGroupMsg,
+} from "../util/bot";
 import { createFetch } from "../util/http";
 
 const info = {
@@ -25,6 +31,9 @@ const info = {
 schedule.scheduleJob(`0 */5 * * * *`, async () => {
   const biliFindAll = await biliModel.findAll();
   biliFindAll.forEach(async (bili) => {
+    if (!groupInfo(bili.gid)) {
+      return;
+    }
     const pluginState = await pluginModel.findOrAddOne(
       bili.gid,
       "订阅推送",

@@ -11,9 +11,9 @@ import schedule from "node-schedule";
 import * as groupModel from "../model/group.ts";
 import * as pluginModel from "../model/plugin.ts";
 import { findActiveAccount } from "../model/qq.ts";
+import { setTalkTime } from "../plugin/talk.ts";
 import { logger } from "./logger.ts";
 import { sleep } from "./util.ts";
-import { setTalkTime } from "../plugin/talk.ts";
 
 const bots: Array<Client | undefined> = [];
 let masterBotUin: number | undefined = undefined;
@@ -212,6 +212,14 @@ function msgNoCmd(msg: string, cmd: string[]) {
   );
 }
 
+function groupInfo(gid: number) {
+  const groupInfo = getBots()[0]?.getGroupList().get(gid);
+  if (!groupInfo) {
+    return undefined;
+  }
+  return groupInfo;
+}
+
 //初始化bot，登陆所有QQ账户
 async function init() {
   await login();
@@ -220,4 +228,4 @@ async function init() {
   listener();
 }
 
-export { getBots, init, msgNoCmd, replyGroupMsg, sendGroupMsg };
+export { getBots, groupInfo, init, msgNoCmd, replyGroupMsg, sendGroupMsg };
