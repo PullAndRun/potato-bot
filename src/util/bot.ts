@@ -13,6 +13,7 @@ import * as pluginModel from "../model/plugin.ts";
 import { findActiveAccount } from "../model/qq.ts";
 import { logger } from "./logger.ts";
 import { sleep } from "./util.ts";
+import { setTalkTime } from "../plugin/talk.ts";
 
 const bots: Array<Client | undefined> = [];
 let masterBotUin: number | undefined = undefined;
@@ -128,6 +129,7 @@ async function replyGroupMsg(
 function masterBotListener() {
   masterBotUin = getBots()[0]?.uin;
   getBots()[0]?.on("message.group", async (event) => {
+    setTalkTime(event.group_id);
     //群消息去空格
     const raw_message = event.raw_message.replaceAll(" ", "");
     //不是命令或只有触发词就返回

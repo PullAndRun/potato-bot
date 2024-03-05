@@ -14,9 +14,6 @@ class Group extends BaseEntity {
   @Column({ type: "text", comment: "自定义ai聊天指令", default: "" })
   customPrompt: string;
 
-  @Column({ type: "boolean", comment: "是否正在闲聊", default: false })
-  talking: boolean;
-
   @Column({ type: "boolean", comment: "是否在群里", default: true })
   active: boolean;
 }

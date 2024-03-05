@@ -123,6 +123,7 @@ async function push(message: string, event: GroupMessageEvent) {
   await replyGroupMsg(event, [intro], true);
 }
 
+//bot设置 推送 xxx 开启/关闭
 async function pushSwitch(
   message: string,
   type: string,

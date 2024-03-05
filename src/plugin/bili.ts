@@ -25,7 +25,11 @@ const info = {
 schedule.scheduleJob(`0 */5 * * * *`, async () => {
   const biliFindAll = await biliModel.findAll();
   biliFindAll.forEach(async (bili) => {
-    const pluginState = await pluginModel.findOne(bili.gid, "订阅");
+    const pluginState = await pluginModel.findOrAddOne(
+      bili.gid,
+      "订阅推送",
+      true
+    );
     if (pluginState === null) {
       return;
     }

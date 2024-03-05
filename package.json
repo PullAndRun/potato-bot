@@ -10,6 +10,7 @@
     "@icqqjs/icqq": "^1.0.2",
     "@potato/bot": "file:src",
     "@potato/config": "file:config",
+    "@potato/resource": "file:data/resource",
     "cheerio": "^1.0.0-rc.12",
     "consola": "^3.2.3",
     "dayjs": "^1.11.10",
