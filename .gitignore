@@ -2,8 +2,6 @@
 !/config/template
 /node_modules
 /package-lock.json
-/lib/icqq
-/lib/ffmpeg
 /log
 /doc/private
 test*.*

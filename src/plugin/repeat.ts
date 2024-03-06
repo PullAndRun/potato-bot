@@ -37,7 +37,7 @@ async function plugin(event: GroupMessageEvent) {
 function repeat(gid: number, message: string, count: number = 3) {
   const times = repeatMap.get(gid)?.times;
   const msg = repeatMap.get(gid)?.msg;
-  if (!times || !msg || message !== msg) {
+  if (times === undefined || msg === undefined || message !== msg) {
     repeatMap.set(gid, { msg: message, times: 1 });
     return undefined;
   }

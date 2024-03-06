@@ -49,8 +49,6 @@ schedule.scheduleJob(`0 */5 * * * *`, async () => {
 async function loginOneAccount(uin: number, password: string, order: number) {
   const client = createClient({
     sign_api_addr: botConf.sign_api_addr,
-    ffmpeg_path: botConf.ffmpeg_path,
-    ffprobe_path: botConf.ffprobe_path,
     data_dir: botConf.data_dir,
   });
   client
@@ -61,7 +59,7 @@ async function loginOneAccount(uin: number, password: string, order: number) {
       );
       await client.submitSlider(ticket);
     })
-    .on("system.login.device", async (v) => {
+    .on("system.login.device", async (_) => {
       await client.sendSmsCode();
       const smsCode = await consola.prompt(
         `\nQQ登陆 -> 输入短信验证码\nbot -> ${uin}`,
@@ -109,7 +107,7 @@ async function sendGroupMsg(
   if (client === undefined) {
     return;
   }
-  return client.sendGroupMsg(gid, message).catch((e) => {
+  return client.sendGroupMsg(gid, message).catch((_) => {
     logger.error(`\n错误：群消息发送失败\n消息内容：${message}`);
   });
 }
@@ -118,17 +116,18 @@ async function sendGroupMsg(
 async function replyGroupMsg(
   event: GroupMessageEvent,
   message: Sendable,
-  quote: boolean = false
+  quote: boolean = true
 ) {
-  return event.reply(message, quote).catch((e) => {
+  return event.reply(message, quote).catch((_) => {
     logger.error(`\n错误：群消息回复失败\n消息内容：${message}`);
   });
 }
 
 //主bot监听器
 function masterBotListener() {
-  masterBotUin = getBots()[0]?.uin;
-  getBots()[0]?.on("message.group", async (event) => {
+  masterBotUin = getMasterBot().uin;
+  getMasterBot().on("message.group", async (event) => {
+    //记录群聊时间，给闲聊功能用
     setTalkTime(event.group_id);
     //群消息去空格
     const raw_message = event.raw_message.replaceAll(" ", "");
@@ -153,7 +152,7 @@ function masterBotListener() {
     //插件没激活或注册失败就返回
     if (findPlugin && !findPlugin.active) {
       await sendGroupMsg(
-        getBots()[0],
+        getMasterBot(),
         event.group_id,
         `错误：${pickPlugin.name}功能未激活，联系管理员激活。`
       );
@@ -168,6 +167,7 @@ function masterBotListener() {
 function listener() {
   getBots().forEach((bot) => {
     bot.on("system.online", async (event) => {
+      await sleep(5000);
       const uins = bot.getGroupList();
       for (const [uin] of uins) {
         await groupModel.findOrAddOne(uin);
@@ -179,6 +179,7 @@ function listener() {
       await sleep(5000);
       await bot.reloadGroupList();
       await groupModel.findOrAddOne(event.group_id);
+      await groupModel.updateActiveGroup(event.group_id);
     });
     //管理员退群，机器人退群
     bot.on("notice.group.decrease", async (event) => {
@@ -212,12 +213,16 @@ function msgNoCmd(msg: string, cmd: string[]) {
   );
 }
 
-function groupInfo(gid: number) {
-  const groupInfo = getBots()[0]?.getGroupList().get(gid);
-  if (!groupInfo) {
-    return undefined;
+function getMasterBot() {
+  const bot = getBots()[0];
+  if (bot === undefined) {
+    throw new Error("没有在线机器人");
   }
-  return groupInfo;
+  return bot;
+}
+
+function groupInfo(gid: number) {
+  return getMasterBot().getGroupList().get(gid);
 }
 
 //初始化bot，登陆所有QQ账户
@@ -228,4 +233,12 @@ async function init() {
   listener();
 }
 
-export { getBots, groupInfo, init, msgNoCmd, replyGroupMsg, sendGroupMsg };
+export {
+  getBots,
+  getMasterBot,
+  groupInfo,
+  init,
+  msgNoCmd,
+  replyGroupMsg,
+  sendGroupMsg,
+};

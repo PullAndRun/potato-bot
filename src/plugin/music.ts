@@ -35,26 +35,22 @@ async function plugin(event: GroupMessageEvent) {
 
 async function sendMusicMsg(event: GroupMessageEvent, ids: number | undefined) {
   if (ids === undefined) {
-    await replyGroupMsg(event, [`点歌失败！系统异常，请稍后再试。`], true);
+    await replyGroupMsg(event, [`点歌失败！系统异常，请稍后再试。`]);
     return;
   }
   const detail = await idsToDetail(ids);
   if (detail === undefined) {
-    await replyGroupMsg(event, [`点歌失败！请换首歌，或稍后重试。`], true);
+    await replyGroupMsg(event, [`点歌失败！请换首歌，或稍后重试。`]);
     return;
   }
-  await replyGroupMsg(
-    event,
-    [
-      segment.image(detail.album.pic),
-      `\n传送门：${detail.url}`,
-      `\n歌曲名：${detail.name}`,
-      `\n歌手：${detail.singer}`,
-      `\n专辑：${detail.album.name}`,
-      `\n热评：${detail.comment}`,
-    ],
-    true
-  );
+  await replyGroupMsg(event, [
+    segment.image(detail.album.pic),
+    `\n传送门：${detail.url}`,
+    `\n歌曲名：${detail.name}`,
+    `\n歌手：${detail.singer}`,
+    `\n专辑：${detail.album.name}`,
+    detail.comment ? `\n热评：${detail.comment}` : "",
+  ]);
 }
 
 async function topToIds() {
@@ -109,9 +105,6 @@ async function keywordToIds(keyword: string) {
       return result.data.body.result.songs[0]?.id;
     })
     .catch((_) => undefined);
-  if (searchIds === undefined) {
-    return undefined;
-  }
   return searchIds;
 }
 

@@ -9,8 +9,7 @@ import { XMLParser } from "fast-xml-parser";
 import schedule from "node-schedule";
 import { z } from "zod";
 import {
-  getBots,
-  groupInfo,
+  getMasterBot,
   msgNoCmd,
   replyGroupMsg,
   sendGroupMsg,
@@ -29,42 +28,46 @@ const info = {
 };
 
 schedule.scheduleJob(`0 */5 * * * *`, async () => {
-  const biliFindAll = await biliModel.findAll();
-  biliFindAll.forEach(async (bili) => {
-    if (!groupInfo(bili.gid)) {
-      return;
-    }
-    const pluginState = await pluginModel.findOrAddOne(
-      bili.gid,
-      "订阅推送",
-      true
-    );
-    if (pluginState === null) {
-      return;
-    }
-    const live = await findLive(bili.rid);
-    const dynamic = await findDynamic(bili.mid);
-    if (
-      live !== undefined &&
-      dayjs().subtract(5, "minute").isBefore(dayjs(live.pubDate))
-    ) {
-      await sendGroupMsg(getBots()[0], bili.gid, [
-        `【${bili.name}】正在直播！\n`,
-        `标题：${live.title}\n`,
-        `传送门：${live.link}`,
-      ]);
-    }
-    if (
-      dynamic &&
-      dayjs().subtract(5, "minute").isBefore(dayjs(dynamic.pubDate))
-    ) {
-      await sendGroupMsg(getBots()[0], bili.gid, [
-        `【${bili.name}】 有新动态！\n`,
-        `动态：${dynamic.description}\n`,
-        `传送门：${dynamic.link}`,
-      ]);
-    }
-  });
+  getMasterBot()
+    .getGroupList()
+    .forEach(async (group) => {
+      const pluginState = await pluginModel.findOrAddOne(
+        group.group_id,
+        "订阅推送",
+        true
+      );
+      if (pluginState === null) {
+        return;
+      }
+      const biliGroup = await biliModel.findByGid(group.group_id);
+      if (biliGroup.length === 0) {
+        return;
+      }
+      biliGroup.forEach(async (bili) => {
+        const live = await findLive(bili.rid);
+        const dynamic = await findDynamic(bili.mid);
+        if (
+          live !== undefined &&
+          dayjs().subtract(5, "minute").isBefore(dayjs(live.pubDate))
+        ) {
+          await sendGroupMsg(getMasterBot(), bili.gid, [
+            `【${bili.name}】正在直播！\n`,
+            `标题：${live.title}\n`,
+            `传送门：${live.link}`,
+          ]);
+        }
+        if (
+          dynamic &&
+          dayjs().subtract(5, "minute").isBefore(dayjs(dynamic.pubDate))
+        ) {
+          await sendGroupMsg(getMasterBot(), bili.gid, [
+            `【${bili.name}】 有新动态！\n`,
+            `动态：${dynamic.description}\n`,
+            `传送门：${dynamic.link}`,
+          ]);
+        }
+      });
+    });
 });
 
 async function plugin(event: GroupMessageEvent) {
@@ -98,11 +101,9 @@ async function plugin(event: GroupMessageEvent) {
       (cmd.auth && event.sender.role === "member") ||
       (cmd.auth && !botConf.admin.includes(event.sender.user_id))
     ) {
-      await replyGroupMsg(
-        event,
-        ["您使用的命令需要群管理员权限，请联系群管理员。"],
-        true
-      );
+      await replyGroupMsg(event, [
+        "您使用的命令需要群管理员权限，请联系群管理员。",
+      ]);
       break;
     }
     cmd.plugin(cmd.name, event);
@@ -116,23 +117,22 @@ async function plugin(event: GroupMessageEvent) {
         }`
     )
     .join("\n\n");
-  await replyGroupMsg(event, [intro], true);
+  await replyGroupMsg(event, [intro]);
 }
 
+//bot订阅 新增
 async function addSub(message: string, event: GroupMessageEvent) {
   const msg = msgNoCmd(message, ["新增"]).split(" ");
   if (msg.length === 0) {
-    await replyGroupMsg(
-      event,
-      [`命令错误。请使用“${botConf.trigger}订阅”获取命令的正确使用方式。`],
-      true
-    );
+    await replyGroupMsg(event, [
+      `命令错误。请使用“${botConf.trigger}订阅”获取命令的正确使用方式。`,
+    ]);
     return;
   }
   const users = await Promise.all(
     msg.map(async (up) => {
       const user = await findUser(up);
-      if (user?.uname !== up) {
+      if (user === undefined || user.uname !== up) {
         return undefined;
       }
       await biliModel.add(user.uname, event.group_id, user.mid, user.room_id);
@@ -140,28 +140,22 @@ async function addSub(message: string, event: GroupMessageEvent) {
     })
   ).then((users) => users.filter((user) => user !== undefined));
   if (users.length === 0) {
-    await replyGroupMsg(
-      event,
-      [`新增订阅失败，请检查up主昵称是否拼写正确。`],
-      true
-    );
+    await replyGroupMsg(event, [`新增订阅失败，请检查up主昵称是否拼写正确。`]);
     return;
   }
-  await replyGroupMsg(
-    event,
-    [`新增订阅成功，本次新增订阅：\n`, users.join("\n")],
-    true
-  );
+  await replyGroupMsg(event, [
+    `新增订阅成功，本次新增订阅：\n`,
+    users.join("\n"),
+  ]);
 }
 
+//bot订阅 取消
 async function removeSub(message: string, event: GroupMessageEvent) {
   const msg = msgNoCmd(message, ["取消"]).split(" ");
   if (msg.length === 0) {
-    await replyGroupMsg(
-      event,
-      [`命令错误。请使用“${botConf.trigger}订阅”获取命令的正确使用方式。`],
-      true
-    );
+    await replyGroupMsg(event, [
+      `命令错误。请使用“${botConf.trigger}订阅”获取命令的正确使用方式。`,
+    ]);
     return;
   }
   const users = await Promise.all(
@@ -174,40 +168,27 @@ async function removeSub(message: string, event: GroupMessageEvent) {
     })
   ).then((users) => users.filter((user) => user !== undefined));
   if (users.length === 0) {
-    await replyGroupMsg(
-      event,
-      [`取消订阅失败，请检查up主昵称是否拼写正确。`],
-      true
-    );
+    await replyGroupMsg(event, [`取消订阅失败，请检查up主昵称是否拼写正确。`]);
     return;
   }
-  await replyGroupMsg(
-    event,
-    [`取消订阅成功，本次取消订阅：\n`, users.join("\n")],
-    true
-  );
+  await replyGroupMsg(event, [
+    `取消订阅成功，本次取消订阅：\n`,
+    users.join("\n"),
+  ]);
 }
 
 async function subList(_: string, event: GroupMessageEvent) {
   const findByGid = await biliModel.findByGid(event.group_id);
   if (findByGid.length === 0) {
-    await replyGroupMsg(
-      event,
-      [
-        `本群还未订阅过任何up主。\n如需订阅up主，请参考“${botConf.trigger}订阅”命令。`,
-      ],
-      true
-    );
+    await replyGroupMsg(event, [
+      `本群还未订阅过任何up主。\n如需订阅up主，请参考“${botConf.trigger}订阅”命令。`,
+    ]);
     return;
   }
-  await replyGroupMsg(
-    event,
-    [
-      "本群订阅过的b站up主列表：\n",
-      findByGid.map((sub) => sub.name).join("\n"),
-    ],
-    true
-  );
+  await replyGroupMsg(event, [
+    "本群订阅过的b站up主列表：\n",
+    findByGid.map((sub) => sub.name).join("\n"),
+  ]);
 }
 
 async function findUser(userName: string) {

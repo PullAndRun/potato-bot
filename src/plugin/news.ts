@@ -2,8 +2,8 @@ import { GroupMessageEvent } from "@icqqjs/icqq";
 import newsConf from "@potato/config/news.json";
 import schedule from "node-schedule";
 import { z } from "zod";
-import { findOrAddOne } from "../model/plugin";
-import { getBots, replyGroupMsg, sendGroupMsg } from "../util/bot";
+import * as pluginModel from "../model/plugin";
+import { getMasterBot, replyGroupMsg, sendGroupMsg } from "../util/bot";
 import { createFetch } from "../util/http";
 
 const info = {
@@ -16,25 +16,25 @@ const info = {
 const newsMap: Map<number, Array<string>> = new Map();
 
 schedule.scheduleJob(`0 0 */1 * * *`, async () => {
-  getBots()[0]
-    ?.getGroupList()
+  getMasterBot()
+    .getGroupList()
     .forEach(async (group) => {
-      const pluginSwitch = await findOrAddOne(
+      const pluginSwitch = await pluginModel.findOrAddOne(
         group.group_id,
         "新闻推送",
         false
       );
-      if (pluginSwitch === undefined || pluginSwitch.active === false) {
+      if (pluginSwitch.active === false) {
         return;
       }
       const news = await pushNews(group.group_id);
       if (news === undefined) {
-        await sendGroupMsg(getBots()[0], group.group_id, [
+        await sendGroupMsg(getMasterBot(), group.group_id, [
           `当前没有新闻，请稍后重试。`,
         ]);
         return;
       }
-      await sendGroupMsg(getBots()[0], group.group_id, [
+      await sendGroupMsg(getMasterBot(), group.group_id, [
         "为您推送新闻：\n\n" + news,
       ]);
     });
@@ -43,10 +43,10 @@ schedule.scheduleJob(`0 0 */1 * * *`, async () => {
 async function plugin(event: GroupMessageEvent) {
   const news = await pushNews(event.group_id);
   if (news === undefined) {
-    await replyGroupMsg(event, [`当前没有新闻，请稍后重试。`], true);
+    await replyGroupMsg(event, [`当前没有新闻，请稍后重试。`]);
     return;
   }
-  await replyGroupMsg(event, ["为您推送新闻：\n\n" + news], true);
+  await replyGroupMsg(event, ["为您推送新闻：\n\n" + news]);
 }
 
 //获取需要向指定群推送的新闻

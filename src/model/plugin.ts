@@ -33,7 +33,7 @@ function findOne(gid: number, name: string) {
   });
 }
 
-async function findOrAddOne(gid: number, name: string, active: boolean) {
+async function findOrAddOne(gid: number, name: string, active: boolean = true) {
   const plugin = await findOne(gid, name);
   if (plugin === null) {
     return add(gid, name, active);
@@ -50,16 +50,31 @@ async function add(gid: number, name: string, active: boolean) {
   return plugin;
 }
 
-async function update(gid: number, name: string, active: boolean) {
-  const plugin = await Plugin.findOneBy({
-    gid: gid,
-    name: name,
-  });
+async function updateActivePlugin(gid: number, name: string) {
+  return pluginSwitch(gid, name, true);
+}
+
+async function updateDisablePlugin(gid: number, name: string) {
+  return pluginSwitch(gid, name, false);
+}
+
+async function pluginSwitch(gid: number, name: string, active: boolean) {
+  const plugin = await findOne(gid, name);
   if (plugin === null) {
     return undefined;
   }
   plugin.active = active;
-  return plugin.save().catch((_) => undefined);
+  plugin.save().catch((_) => undefined);
+  return plugin;
 }
 
-export { Plugin, add, findByGid, findOne, findOrAddOne, update };
+export {
+  Plugin,
+  add,
+  findByGid,
+  findOne,
+  findOrAddOne,
+  pluginSwitch,
+  updateActivePlugin,
+  updateDisablePlugin,
+};

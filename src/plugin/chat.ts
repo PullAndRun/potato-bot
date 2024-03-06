@@ -31,24 +31,19 @@ async function plugin(event: GroupMessageEvent) {
   if (group === null) {
     return;
   }
+  //自定义人格
   if (group.promptName === "自定义") {
-    await replyGroupMsg(
-      event,
-      [await createChat(msg, group.customPrompt)],
-      true
-    );
+    await replyGroupMsg(event, [await createChat(msg, group.customPrompt)]);
     return;
   }
   const commonPrompt = await aiModel.findOne(group.promptName);
+  //选定人格
   if (commonPrompt) {
-    await replyGroupMsg(
-      event,
-      [await createChat(msg, commonPrompt.prompt)],
-      true
-    );
+    await replyGroupMsg(event, [await createChat(msg, commonPrompt.prompt)]);
     return;
   }
-  await replyGroupMsg(event, [await createChat(msg)], true);
+  //默认猫娘人格
+  await replyGroupMsg(event, [await createChat(msg)]);
 }
 
 async function createChat(msg: string, prompt: string | undefined = undefined) {

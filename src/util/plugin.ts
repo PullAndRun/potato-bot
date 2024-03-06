@@ -34,11 +34,9 @@ function pick(message: string) {
   const pickPluginPath = pluginPaths
     .filter(
       (pluginPath) =>
-        message
-          .replaceAll(" ", "")
-          .startsWith(
-            botConf.trigger + require.cache[pluginPath]?.exports.info.name
-          ) && require.cache[pluginPath]?.exports.info.type === "plugin"
+        message.startsWith(
+          botConf.trigger + require.cache[pluginPath]?.exports.info.name
+        ) && require.cache[pluginPath]?.exports.info.type === "plugin"
     )
     .sort((prev, next) => {
       const prevPluginName = require.cache[prev]?.exports.info.name;

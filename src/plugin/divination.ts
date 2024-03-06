@@ -16,14 +16,12 @@ const info = {
 async function plugin(event: GroupMessageEvent) {
   const msg = msgNoCmd(event.raw_message, [botConf.trigger, info.name]);
   if (msg === "") {
-    await replyGroupMsg(
-      event,
-      [`命令错误。请使用“${botConf.trigger}占卜”获取命令的正确使用方式。`],
-      true
-    );
+    await replyGroupMsg(event, [
+      `命令错误。请使用“${botConf.trigger}占卜”获取命令的正确使用方式。`,
+    ]);
     return;
   }
-  await replyGroupMsg(event, [`您占卜的“${msg}”结果是“${divination()}”`], true);
+  await replyGroupMsg(event, [`您占卜的“${msg}”结果是“${divination()}”`]);
 }
 
 function divination() {

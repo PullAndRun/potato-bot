@@ -31,20 +31,14 @@ async function findOrAddOne(gid: number) {
 }
 
 async function updatePromptName(gid: number, promptName: string) {
-  const group = await findOne(gid);
-  if (group === null) {
-    return undefined;
-  }
+  const group = await findOrAddOne(gid);
   group.promptName = promptName;
   group.save().catch((_) => undefined);
   return group;
 }
 
 async function updateCustomPrompt(gid: number, prompt: string) {
-  const group = await findOne(gid);
-  if (group === null) {
-    return undefined;
-  }
+  const group = await findOrAddOne(gid);
   group.promptName = "自定义";
   group.customPrompt = prompt;
   group.save().catch((_) => undefined);
@@ -60,10 +54,7 @@ async function updateDisableGroup(gid: number) {
 }
 
 async function groupSwitch(gid: number, active: boolean) {
-  const group = await findOne(gid);
-  if (group === null) {
-    return undefined;
-  }
+  const group = await findOrAddOne(gid);
   group.active = active;
   group.save().catch((_) => undefined);
   return group;
@@ -78,11 +69,11 @@ async function add(gid: number) {
 
 export {
   Group,
-  findOne,
   add,
+  findOne,
   findOrAddOne,
-  updatePromptName,
-  updateCustomPrompt,
   updateActiveGroup,
+  updateCustomPrompt,
   updateDisableGroup,
+  updatePromptName,
 };

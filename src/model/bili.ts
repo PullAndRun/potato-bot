@@ -25,34 +25,16 @@ class Bili extends BaseEntity {
   rid: number;
 }
 
-function findByMid(mid: number) {
-  return Bili.findBy({
-    mid: mid,
-  });
-}
-
-function findByRid(rid: number) {
-  return Bili.findBy({
-    rid: rid,
-  });
-}
-
 function findByGid(gid: number) {
   return Bili.findBy({
     gid: gid,
   });
 }
 
-function findByName(name: string) {
-  return Bili.findBy({
-    name: name,
-  });
-}
-
 async function removeByName(name: string) {
   return Bili.findOneBy({
     name: name,
-  }).then(async (bili) => await bili?.remove());
+  }).then(async (bili) => await bili?.remove().catch((_) => undefined));
 }
 
 async function add(name: string, gid: number, mid: number, rid: number) {
@@ -69,13 +51,4 @@ function findAll() {
   return Bili.find();
 }
 
-export {
-  Bili,
-  add,
-  findAll,
-  findByGid,
-  findByMid,
-  findByName,
-  findByRid,
-  removeByName,
-};
+export { Bili, add, findAll, findByGid, removeByName };
