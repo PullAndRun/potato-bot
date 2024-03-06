@@ -10,10 +10,20 @@ const info = {
   name: "新闻",
   type: "plugin",
   defaultActive: true,
+  passive: false,
   comment: [`说明：向群内推送新闻`],
   plugin: plugin,
 };
 const newsMap: Map<number, Array<string>> = new Map();
+
+schedule.scheduleJob(`0 0 0 */1 * *`, () => {
+  newsMap.forEach((news, gid) => {
+    if (news.length < 100) {
+      return;
+    }
+    newsMap.set(gid, []);
+  });
+});
 
 schedule.scheduleJob(`0 0 */1 * * *`, async () => {
   getMasterBot()

@@ -9,9 +9,10 @@ import { msgNoCmd, replyGroupMsg } from "../util/bot";
 import { logger } from "../util/logger";
 
 const info = {
-  name: "",
+  name: "聊天",
   type: "plugin",
   defaultActive: true,
+  passive: true,
   comment: [
     `说明：AI聊天，内置多种人格`,
     `使用“${botConf.trigger}设置”了解如何变更AI人格。`,
@@ -65,7 +66,7 @@ async function createChat(msg: string, prompt: string | undefined = undefined) {
 async function chat(msg: ChatCompletionMessageParam[]) {
   const response = await openai.chat.completions
     .create({
-      model: "gpt-3.5-turbo-16k-0613",
+      model: "gpt-3.5-turbo-1106",
       messages: msg,
       temperature: aiConf.temperature,
       max_tokens: aiConf.max_tokens,
@@ -76,7 +77,7 @@ async function chat(msg: ChatCompletionMessageParam[]) {
     })
     .then((chatCompletion) => chatCompletion.choices[0]?.message.content)
     .catch((e) => {
-      logger.error(`\n错误：ai聊天错误\n聊天内容：${msg}\n错误信息：${e}`);
+      logger.error(`\n错误：ai聊天错误\n错误信息：${e}\n聊天内容：`, msg);
       return "AI系统异常，请稍后再试。";
     });
   if (!response) {

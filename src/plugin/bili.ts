@@ -20,12 +20,26 @@ const info = {
   name: "订阅",
   type: "plugin",
   defaultActive: true,
+  passive: false,
   comment: [
     `说明：向群内推送b站up主的开播通知和动态`,
     `使用“${botConf.trigger}订阅”了解如何订阅b站up主`,
   ],
   plugin: plugin,
 };
+
+schedule.scheduleJob(`0 0 0 */1 * *`, async () => {
+  const biliFindAll = await biliModel.findAll();
+  biliFindAll.forEach(async (bili) => {
+    if (bili.rid === 0) {
+      const user = await findUser(bili.name);
+      if (user === undefined || user.room_id === 0) {
+        return;
+      }
+      await biliModel.updateRid(bili.mid, user.room_id);
+    }
+  });
+});
 
 schedule.scheduleJob(`0 */5 * * * *`, async () => {
   getMasterBot()
@@ -85,7 +99,6 @@ async function plugin(event: GroupMessageEvent) {
       auth: true,
       plugin: removeSub,
     },
-
     {
       name: "列表",
       comment: `使用“${botConf.trigger}列表“命令展示已订阅up主列表`,
@@ -106,13 +119,13 @@ async function plugin(event: GroupMessageEvent) {
       ]);
       break;
     }
-    cmd.plugin(cmd.name, event);
+    cmd.plugin(msg, event);
     return;
   }
   const intro = secondCmd
     .map(
       (cmd) =>
-        `功能：${cmd.name}\n说明：${cmd.comment}\n需要群管权限:${
+        `功能：${cmd.name}\n说明：${cmd.comment}\n需要管理员权限:${
           cmd.auth ? "是" : "否"
         }`
     )
@@ -221,6 +234,9 @@ async function findUser(userName: string) {
 }
 
 async function findLive(room_id: number) {
+  if (room_id === 0) {
+    return undefined;
+  }
   const roomInfo = await createFetch(
     `${biliConf.api.live}${room_id}`,
     5000

@@ -32,9 +32,24 @@ function findByGid(gid: number) {
 }
 
 async function removeByName(name: string) {
-  return Bili.findOneBy({
+  const user = await Bili.findOneBy({
     name: name,
-  }).then(async (bili) => await bili?.remove().catch((_) => undefined));
+  });
+  if (user === null) {
+    return undefined;
+  }
+  user.remove().catch((_) => undefined);
+  return user;
+}
+
+async function updateRid(mid: number, rid: number) {
+  const user = await Bili.findOneBy({ mid: mid });
+  if (user === null) {
+    return undefined;
+  }
+  user.rid = rid;
+  await user.save().catch((_) => undefined);
+  return user;
 }
 
 async function add(name: string, gid: number, mid: number, rid: number) {
@@ -51,4 +66,4 @@ function findAll() {
   return Bili.find();
 }
 
-export { Bili, add, findAll, findByGid, removeByName };
+export { Bili, add, findAll, findByGid, removeByName, updateRid };

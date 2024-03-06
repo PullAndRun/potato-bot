@@ -8,7 +8,7 @@ import {
 
 @Entity()
 @Index(["gid", "uin"], { unique: true })
-class QQ extends BaseEntity {
+class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -26,34 +26,34 @@ class QQ extends BaseEntity {
 }
 
 function findOne(gid: number, uin: number) {
-  return QQ.findOneBy({
+  return User.findOneBy({
     gid: gid,
     uin: uin,
   });
 }
 
 async function findOrAddOne(uin: number, gid: number) {
-  const qq = await findOne(gid, uin);
-  if (qq === null) {
+  const user = await findOne(gid, uin);
+  if (user === null) {
     return add(uin, gid);
   }
-  return qq;
+  return user;
 }
 
 async function updateSign(uin: number, gid: number) {
-  const qq = await findOrAddOne(uin, gid);
-  qq.sign = qq.sign + 1;
-  qq.signTime = new Date();
-  qq.save().catch((_) => undefined);
-  return qq;
+  const user = await findOrAddOne(uin, gid);
+  user.sign = user.sign + 1;
+  user.signTime = new Date();
+  user.save().catch((_) => undefined);
+  return user;
 }
 
 async function add(uin: number, gid: number) {
-  const qq = new QQ();
-  qq.uin = uin;
-  qq.gid = gid;
-  qq.save().catch((_) => undefined);
-  return qq;
+  const user = new User();
+  user.uin = uin;
+  user.gid = gid;
+  user.save().catch((_) => undefined);
+  return user;
 }
 
-export { QQ, add, findOne, findOrAddOne, updateSign };
+export { User, add, findOne, findOrAddOne, updateSign };

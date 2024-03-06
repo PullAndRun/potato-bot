@@ -9,6 +9,7 @@ const info = {
   name: "设置",
   type: "plugin",
   defaultActive: true,
+  passive: false,
   comment: [
     `说明：设置机器人各项功能`,
     `使用“${botConf.trigger}设置”命令了解如何设置机器人`,
@@ -28,7 +29,7 @@ async function plugin(event: GroupMessageEvent) {
     },
     {
       name: "关闭插件",
-      comment: `使用“${botConf.trigger}设置 开启插件 插件名“命令关闭插件\n插件名源自“${botConf.trigger}帮助”命令`,
+      comment: `使用“${botConf.trigger}设置 关闭插件 插件名“命令关闭插件\n插件名源自“${botConf.trigger}帮助”命令`,
       auth: true,
       plugin: disable,
     },
@@ -84,7 +85,7 @@ async function plugin(event: GroupMessageEvent) {
       (cmd) =>
         `指令：${botConf.trigger} ${info.name} ${cmd.name}\n说明：${
           cmd.comment
-        }\n需要群管权限:${cmd.auth ? "是" : "否"}`
+        }\n需要管理员权限:${cmd.auth ? "是" : "否"}`
     )
     .join("\n\n");
   await replyGroupMsg(event, [intro]);
@@ -115,7 +116,7 @@ async function push(message: string, event: GroupMessageEvent) {
   const intro = secondCmd
     .map(
       (cmd) =>
-        `指令：${botConf.trigger} ${info.name} 推送 ${cmd.name}\n说明：${cmd.comment}\n需要群管权限:是`
+        `指令：${botConf.trigger} ${info.name} 推送 ${cmd.name}\n说明：${cmd.comment}\n需要管理员权限:是`
     )
     .join("\n\n");
   await replyGroupMsg(event, [intro]);
@@ -222,9 +223,9 @@ async function setPrompt(message: string, event: GroupMessageEvent) {
   await replyGroupMsg(event, [`AI人格变更为您定义的prompts`]);
 }
 
-//bot设置 开启
+//bot设置 开启插件
 async function active(message: string, event: GroupMessageEvent) {
-  const msg = msgNoCmd(message, ["开启"]).split(" ");
+  const msg = msgNoCmd(message, ["开启插件"]).split(" ");
   if (msg.length === 0) {
     await replyGroupMsg(event, [
       `命令错误。请使用“${botConf.trigger}设置”获取命令的正确使用方式。`,
@@ -241,9 +242,9 @@ async function active(message: string, event: GroupMessageEvent) {
   await replyGroupMsg(event, [`已开启插件：${activeResult.join(" ")}`]);
 }
 
-//bot设置 关闭
+//bot设置 关闭插件
 async function disable(message: string, event: GroupMessageEvent) {
-  const msg = msgNoCmd(message, ["关闭"]).split(" ");
+  const msg = msgNoCmd(message, ["关闭插件"]).split(" ");
   if (msg.length === 0) {
     await replyGroupMsg(event, [
       `命令错误。请使用“${botConf.trigger}设置”获取命令的正确使用方式。`,

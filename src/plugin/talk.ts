@@ -15,6 +15,7 @@ const info = {
   name: "闲聊",
   type: "plugin",
   defaultActive: true,
+  passive: true,
   comment: [`说明：两个机器人互动聊天`],
   plugin: plugin,
 };

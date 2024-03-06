@@ -49,6 +49,19 @@ function pick(message: string) {
   return require.cache[pickPluginPath]?.exports.info;
 }
 
+function pickByName(name: string) {
+  const pickPluginPath = pluginPaths.filter(
+    (pluginPath) =>
+      require.cache[pluginPath]?.exports.info.name === name &&
+      require.cache[pluginPath]?.exports.info.type === "plugin" &&
+      require.cache[pluginPath]?.exports.info.passive === true
+  )[0];
+  if (!pickPluginPath) {
+    return undefined;
+  }
+  return require.cache[pickPluginPath]?.exports.info;
+}
+
 //获取所有插件的info
 function pickAll() {
   return pluginPaths.map(
@@ -60,4 +73,4 @@ async function init() {
   await load();
 }
 
-export { init, load, pick, pickAll, reload };
+export { init, load, pick, pickAll, pickByName, reload };

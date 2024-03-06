@@ -7,6 +7,7 @@ import * as pluginUtil from "../util/plugin";
 const info = {
   name: "帮助",
   type: "plugin",
+  passive: false,
   defaultActive: true,
   comment: [`说明：查询机器人可使用的各项功能。`],
   plugin: plugin,
@@ -24,9 +25,6 @@ async function plugin(event: GroupMessageEvent) {
     pluginUtil
       .pickAll()
       .map((plugin) => {
-        if (plugin.name === "") {
-          plugin.name = "AI聊天";
-        }
         return [`功能：${plugin.name}`, plugin.comment.join("\n")].join("\n");
       })
       .join("\n\n"),
@@ -36,7 +34,7 @@ async function plugin(event: GroupMessageEvent) {
 async function prompts() {
   const allPrompts = await aiModel.findAll();
   return allPrompts
-    .map((prompt, index) => `${index}、人格名：${prompt.promptName}`)
+    .map((prompt, index) => `${index + 1}、人格名：${prompt.promptName}`)
     .join("\n");
 }
 

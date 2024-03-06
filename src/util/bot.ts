@@ -50,6 +50,7 @@ async function loginOneAccount(uin: number, password: string, order: number) {
   const client = createClient({
     sign_api_addr: botConf.sign_api_addr,
     data_dir: botConf.data_dir,
+    log_level: "error",
   });
   client
     .on("system.login.slider", async (v) => {
@@ -131,16 +132,31 @@ function masterBotListener() {
     setTalkTime(event.group_id);
     //群消息去空格
     const raw_message = event.raw_message.replaceAll(" ", "");
-    //不是命令或只有触发词就返回
+    //过滤表情等特殊符号
+    if (cleanupMsg(raw_message) === "") {
+      return;
+    }
+    //如果不是bot开头，或只有bot开头，就进入复读插件
     if (
       !raw_message.startsWith(botConf.trigger) ||
       raw_message === botConf.trigger
     ) {
+      const repeatPlugin = pluginUtil.pickByName("复读");
+      if (repeatPlugin === undefined) {
+        return;
+      }
+      repeatPlugin.plugin(event);
       return;
     }
     //获取插件
     const pickPlugin = pluginUtil.pick(raw_message);
+    //如果没有获取到插件，就用聊天插件
     if (!pickPlugin) {
+      const chatPlugin = pluginUtil.pickByName("聊天");
+      if (chatPlugin === undefined) {
+        return;
+      }
+      chatPlugin.plugin(event);
       return;
     }
     //数据库查询插件状态，没查询到就注册插件
@@ -163,34 +179,35 @@ function masterBotListener() {
   });
 }
 
+//初始化群Model
+async function initGroupModel(client: Client) {
+  const uins = client.getGroupList();
+  for (const [uin] of uins) {
+    await groupModel.findOrAddOne(uin);
+  }
+}
+
 //监听器
 function listener() {
-  getBots().forEach((bot) => {
-    bot.on("system.online", async (event) => {
-      await sleep(5000);
-      const uins = bot.getGroupList();
-      for (const [uin] of uins) {
-        await groupModel.findOrAddOne(uin);
-      }
-    });
+  getBots().forEach(async (client) => {
     //自动接受邀请入群
-    bot.on("request.group.invite", async (event) => {
+    client.on("request.group.invite", async (event) => {
       await event.approve(true);
       await sleep(5000);
-      await bot.reloadGroupList();
+      await client.reloadGroupList();
       await groupModel.findOrAddOne(event.group_id);
       await groupModel.updateActiveGroup(event.group_id);
     });
     //管理员退群，机器人退群
-    bot.on("notice.group.decrease", async (event) => {
+    client.on("notice.group.decrease", async (event) => {
       for (const admin of botConf.admin) {
         if (event.operator_id === admin) {
-          await bot.setGroupLeave(event.group_id);
+          await client.setGroupLeave(event.group_id);
           await sleep(5000);
-          await bot.reloadGroupList();
+          await client.reloadGroupList();
           await groupModel.updateDisableGroup(event.group_id);
           logger.warn(
-            `\n警告：机器人账号 ${bot.uin} 退出了群 ${event.group_id}`
+            `\n警告：机器人账号 ${client.uin} 退出了群 ${event.group_id}`
           );
         }
       }
@@ -202,15 +219,17 @@ function listener() {
 function msgNoCmd(msg: string, cmd: string[]) {
   return cmd.reduce(
     (acc, cur) =>
-      acc
-        .replace(
-          new RegExp(`(^\\s*${cur}\\s*)|(\\s*$)|(\\[\\])|(\\[(.+?)\\])`, "g"),
-          ""
-        )
-        .replace(/(\r+)/g, "\r")
-        .replace(/\s+/g, " "),
+      cleanupMsg(acc.replace(new RegExp(`(^\\s*${cur}\\s*)`, "g"), "")),
     msg
   );
+}
+
+function cleanupMsg(msg: string) {
+  return msg
+    .trim()
+    .replace(new RegExp(`(\\[\\])|(\\[(.+?)\\])`, "g"), "")
+    .replace(/(\r+)/g, "\r")
+    .replace(/\s+/g, " ");
 }
 
 function getMasterBot() {
@@ -231,9 +250,11 @@ async function init() {
   await sleep(10000);
   masterBotListener();
   listener();
+  await initGroupModel(getMasterBot());
 }
 
 export {
+  cleanupMsg,
   getBots,
   getMasterBot,
   groupInfo,

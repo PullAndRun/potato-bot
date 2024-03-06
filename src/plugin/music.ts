@@ -9,6 +9,7 @@ const info = {
   name: "点歌",
   type: "plugin",
   defaultActive: true,
+  passive: false,
   comment: [
     `说明：点一首网易云音乐的歌`,
     `使用“${botConf.trigger}点歌 歌曲名或歌曲id”点歌`,

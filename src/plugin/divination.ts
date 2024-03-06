@@ -6,6 +6,7 @@ const info = {
   name: "占卜",
   type: "plugin",
   defaultActive: true,
+  passive: false,
   comment: [
     `说明：占卜各种事情`,
     `使用“${botConf.trigger}占卜 占卜的事情”进行占卜`,
@@ -17,7 +18,7 @@ async function plugin(event: GroupMessageEvent) {
   const msg = msgNoCmd(event.raw_message, [botConf.trigger, info.name]);
   if (msg === "") {
     await replyGroupMsg(event, [
-      `命令错误。请使用“${botConf.trigger}占卜”获取命令的正确使用方式。`,
+      `命令错误。请使用“${botConf.trigger}帮助”获取命令的正确使用方式。`,
     ]);
     return;
   }

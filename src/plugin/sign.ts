@@ -8,6 +8,7 @@ const info = {
   name: "签到",
   type: "plugin",
   defaultActive: true,
+  passive: true,
   comment: [`说明：签到并获取幸运词条`],
   plugin: plugin,
 };
@@ -17,7 +18,7 @@ async function plugin(event: GroupMessageEvent) {
     event.sender.user_id,
     event.group_id
   );
-  if (dayjs(user.signTime).isSame(dayjs(), "day")) {
+  if (user.signTime !== null && dayjs(user.signTime).isSame(dayjs(), "day")) {
     await replyGroupMsg(event, ["您今天已经签到过，无法重复签到。"]);
     return;
   }
@@ -32,8 +33,8 @@ async function plugin(event: GroupMessageEvent) {
     .catch((_) => undefined);
   await replyGroupMsg(event, [
     `签到成功！您累积签到 ${updateResult.sign} 天\n`,
-    luckyWord || `您今天的幸运词是：${luckyWord}\n`,
-    luckyWord || `关于幸运词：https://zh.moegirl.org.cn/${luckyWord}`,
+    luckyWord ? `您今天的幸运词是：${luckyWord}\n` : "",
+    luckyWord ? `关于幸运词：https://zh.moegirl.org.cn/${luckyWord}` : "",
   ]);
 }
 
