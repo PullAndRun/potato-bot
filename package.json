@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "potato-bot",
   "scripts": {
-    "bot": "ts-node app/main.ts"
+    "bot": "ts-node src/main.ts"
   },
   "license": "GPL-3.0",
   "dependencies": {
