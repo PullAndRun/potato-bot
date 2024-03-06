@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import * as userModel from "../model/user";
 import { replyGroupMsg } from "../util/bot";
 import { createFetch } from "../util/http";
+import { init } from "../util/db";
 
 const info = {
   name: "签到",
@@ -18,7 +19,10 @@ async function plugin(event: GroupMessageEvent) {
     event.sender.user_id,
     event.group_id
   );
-  if (user.signTime !== null && dayjs(user.signTime).isSame(dayjs(), "day")) {
+  if (
+    user.signTime !== undefined &&
+    dayjs(user.signTime).isSame(dayjs(), "day")
+  ) {
     await replyGroupMsg(event, ["您今天已经签到过，无法重复签到。"]);
     return;
   }

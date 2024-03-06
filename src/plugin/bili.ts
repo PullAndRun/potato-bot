@@ -111,13 +111,14 @@ async function plugin(event: GroupMessageEvent) {
       continue;
     }
     if (
-      (cmd.auth && event.sender.role === "member") ||
-      (cmd.auth && !botConf.admin.includes(event.sender.user_id))
+      cmd.auth &&
+      event.sender.role === "member" &&
+      !botConf.admin.includes(event.sender.user_id)
     ) {
       await replyGroupMsg(event, [
         "您使用的命令需要群管理员权限，请联系群管理员。",
       ]);
-      break;
+      return;
     }
     cmd.plugin(msg, event);
     return;

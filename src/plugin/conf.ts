@@ -4,6 +4,7 @@ import * as groupModel from "@potato/bot/model/group.ts";
 import * as pluginModel from "@potato/bot/model/plugin.ts";
 import botConf from "@potato/config/bot.json";
 import { msgNoCmd, replyGroupMsg } from "../util/bot";
+import { reload } from "../util/plugin";
 
 const info = {
   name: "设置",
@@ -40,6 +41,12 @@ async function plugin(event: GroupMessageEvent) {
       plugin: pluginState,
     },
     {
+      name: "升级插件",
+      comment: `使用“${botConf.trigger}设置 升级插件“命令升级选定插件`,
+      auth: true,
+      plugin: updatePlugin,
+    },
+    {
       name: "人格",
       comment: `使用“${botConf.trigger}设置 人格 人格名“命令切换聊天AI人格\n人格名源自“${botConf.trigger}帮助 AI人格”命令`,
       auth: false,
@@ -69,8 +76,9 @@ async function plugin(event: GroupMessageEvent) {
       continue;
     }
     if (
-      (cmd.auth && event.sender.role === "member") ||
-      (cmd.auth && !botConf.admin.includes(event.sender.user_id))
+      cmd.auth &&
+      event.sender.role === "member" &&
+      !botConf.admin.includes(event.sender.user_id)
     ) {
       await replyGroupMsg(event, [
         "您使用的命令需要群管理员权限，请联系群管理员。",
@@ -89,6 +97,21 @@ async function plugin(event: GroupMessageEvent) {
     )
     .join("\n\n");
   await replyGroupMsg(event, [intro]);
+}
+
+//bot设置 升级插件
+async function updatePlugin(message: string, event: GroupMessageEvent) {
+  const msg = msgNoCmd(message, ["升级插件"]);
+  if (msg === "") {
+    await replyGroupMsg(event, ["未输入升级需要的插件文件名。"]);
+    return;
+  }
+  const plugin = reload(msg);
+  if (plugin === undefined) {
+    await replyGroupMsg(event, ["升级失败"]);
+    return;
+  }
+  await replyGroupMsg(event, ["升级成功"]);
 }
 
 //bot设置 推送

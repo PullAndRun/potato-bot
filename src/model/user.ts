@@ -52,6 +52,7 @@ async function add(uin: number, gid: number) {
   const user = new User();
   user.uin = uin;
   user.gid = gid;
+  user.sign = 0;
   user.save().catch((_) => undefined);
   return user;
 }
