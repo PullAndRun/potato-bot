@@ -5,6 +5,6 @@
   "password": "",
   "database": "bot",
   "synchronize": true,
-  "logging": true,
+  "logging": false,
   "entities": ["src/model/*.ts"]
 }

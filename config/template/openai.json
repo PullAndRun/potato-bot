@@ -1,0 +1,12 @@
+{
+  "account": {
+    "apiKey": "",
+    "baseURL": "https://change-this/v1/"
+  },
+  "temperature": 0.9,
+  "max_tokens": 1000,
+  "top_p": 1.0,
+  "frequency_penalty": 0.1,
+  "presence_penalty": 2.0,
+  "n": 1
+}

@@ -1,0 +1,8 @@
+{
+  "api": {
+    "user": "https://api.bilibili.com/x/web-interface/search/type?jsonp=jsonp&search_type=bili_user&keyword=",
+    "live": "http://change-this/bilibili/live/room/",
+    "dynamic": "http://change-this/bilibili/user/dynamic/"
+  },
+  "cookie": ""
+}
