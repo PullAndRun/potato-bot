@@ -101,7 +101,7 @@ async function plugin(event: GroupMessageEvent) {
     },
     {
       name: "列表",
-      comment: `使用“${botConf.trigger}列表“命令展示已订阅up主列表`,
+      comment: `使用“${botConf.trigger}订阅 列表“命令展示已订阅up主列表`,
       auth: false,
       plugin: subList,
     },
