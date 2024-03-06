@@ -59,7 +59,7 @@ async function updateDisablePlugin(gid: number, name: string) {
 }
 
 async function pluginSwitch(gid: number, name: string, active: boolean) {
-  const plugin = await findOne(gid, name);
+  const plugin = await findOrAddOne(gid, name);
   if (plugin === null) {
     return undefined;
   }
