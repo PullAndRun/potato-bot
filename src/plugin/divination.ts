@@ -18,7 +18,7 @@ async function plugin(event: GroupMessageEvent) {
   const msg = msgNoCmd(event.raw_message, [botConf.trigger, info.name]);
   if (msg === "") {
     await replyGroupMsg(event, [
-      `命令错误。请使用“${botConf.trigger}帮助”获取命令的正确使用方式。`,
+      `命令错误。请输入您想占卜的内容。例如：${botConf.trigger}占卜 今天运气`,
     ]);
     return;
   }
