@@ -242,9 +242,9 @@ async function pluginsState(message: string, event: GroupMessageEvent) {
   ]);
 }
 
-//bot设置 升级插件
+//bot设置 升级
 async function pluginsUpdate(message: string, event: GroupMessageEvent) {
-  const msg = msgNoCmd(message, ["升级插件"]);
+  const msg = msgNoCmd(message, ["升级"]);
   if (msg === "") {
     await replyGroupMsg(event, ["未输入升级需要的插件文件名。"]);
     return;

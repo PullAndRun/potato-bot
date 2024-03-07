@@ -66,7 +66,7 @@ async function biliBoard(message: string, event: GroupMessageEvent) {
     return;
   }
   await replyGroupMsg(event, [
-    `您查询的“${goods}”商品信息：\n`,
+    `您查询的“${info.item}”商品信息：\n`,
     info.hq.average !== 0
       ? `-高品质：\n  服务器：${info.hq.worldName}\n  均价：${info.hq.average}\n  现价：${info.hq.pricePerUnit}\n  数量：${info.hq.quantity}\n  总价：${info.hq.total}`
       : "",
