@@ -1,6 +1,5 @@
 import { GroupMessageEvent } from "@icqqjs/icqq";
 import botConf from "@potato/config/bot.json";
-import * as aiModel from "../model/ai";
 import { msgNoCmd, replyGroupMsg } from "../util/bot";
 import * as pluginUtil from "../util/plugin";
 
@@ -15,27 +14,23 @@ const info = {
 
 async function plugin(event: GroupMessageEvent) {
   const msg = msgNoCmd(event.raw_message, [botConf.trigger, info.name]);
-  if (msg.startsWith("AI人格")) {
-    const prompt = await prompts();
-    await replyGroupMsg(event, [prompt]);
-    return;
+  const helpInfo = pluginUtil.pickAll().map((plugin) => {
+    return [`功能：${plugin.name}`, plugin.comment.join("\n")].join("\n");
+  });
+  const maxPage = Math.ceil(helpInfo.length / 6);
+  let page: number = Number.parseInt(msg);
+  if (isNaN(page) || page < 1) {
+    page = 1;
+  }
+  if (page > maxPage) {
+    page = maxPage;
   }
   await replyGroupMsg(event, [
     `机器人使用说明书：\n`,
-    pluginUtil
-      .pickAll()
-      .map((plugin) => {
-        return [`功能：${plugin.name}`, plugin.comment.join("\n")].join("\n");
-      })
-      .join("\n\n"),
+    helpInfo.filter((_, i) => i >= (page - 1) * 6 && i < page * 6).join("\n\n"),
+    `您在第 ${page} 页，说明书共有 ${maxPage} 页`,
+    `输入“${botConf.trigger}帮助 页码”进行翻页`,
   ]);
-}
-
-async function prompts() {
-  const allPrompts = await aiModel.findAll();
-  return allPrompts
-    .map((prompt, index) => `${index + 1}、人格名：${prompt.promptName}`)
-    .join("\n");
 }
 
 export { info };

@@ -253,6 +253,49 @@ async function init() {
   await initGroupModel(getMasterBot());
 }
 
+async function secondCmd(
+  trigger: string,
+  msg: string,
+  cmdList: Array<{
+    name: string;
+    auth: boolean;
+    comment: string;
+    plugin: (
+      message: string,
+      event: GroupMessageEvent,
+      pluginName: string
+    ) => Promise<void>;
+  }>,
+  event: GroupMessageEvent
+) {
+  for (const cmd of cmdList) {
+    if (!msg.startsWith(cmd.name)) {
+      continue;
+    }
+    if (
+      cmd.auth &&
+      event.sender.role === "member" &&
+      !botConf.admin.includes(event.sender.user_id)
+    ) {
+      await replyGroupMsg(event, [
+        "您使用的命令需要群管理员权限，请联系群管理员。",
+      ]);
+      return;
+    }
+    cmd.plugin(msg, event, cmd.name);
+    return;
+  }
+  const intro = cmdList
+    .map(
+      (cmd) =>
+        `指令：${trigger} ${cmd.name}\n说明：${cmd.comment}\n需要管理员权限:${
+          cmd.auth ? "是" : "否"
+        }`
+    )
+    .join("\n\n");
+  await replyGroupMsg(event, [intro]);
+}
+
 export {
   cleanupMsg,
   getBots,
@@ -261,5 +304,6 @@ export {
   init,
   msgNoCmd,
   replyGroupMsg,
+  secondCmd,
   sendGroupMsg,
 };

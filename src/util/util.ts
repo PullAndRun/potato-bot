@@ -12,4 +12,4 @@ function parseJson(str: string) {
   }
 }
 
-export { sleep, parseJson };
+export { parseJson, sleep };

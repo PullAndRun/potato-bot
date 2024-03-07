@@ -12,6 +12,7 @@ import {
   getMasterBot,
   msgNoCmd,
   replyGroupMsg,
+  secondCmd,
   sendGroupMsg,
 } from "../util/bot";
 import { createFetch } from "../util/http";
@@ -86,18 +87,18 @@ schedule.scheduleJob(`0 */5 * * * *`, async () => {
 
 async function plugin(event: GroupMessageEvent) {
   const msg = msgNoCmd(event.raw_message, [botConf.trigger, info.name]);
-  const secondCmd = [
+  const cmdList = [
     {
       name: "新增",
       comment: `使用“${botConf.trigger}订阅 新增 up主昵称“命令新增订阅up主`,
       auth: true,
-      plugin: addSub,
+      plugin: subAdd,
     },
     {
       name: "取消",
       comment: `使用“${botConf.trigger}订阅 取消 up主昵称“命令取消订阅up主`,
       auth: true,
-      plugin: removeSub,
+      plugin: subRemove,
     },
     {
       name: "列表",
@@ -106,36 +107,11 @@ async function plugin(event: GroupMessageEvent) {
       plugin: subList,
     },
   ];
-  for (const cmd of secondCmd) {
-    if (!msg.startsWith(cmd.name)) {
-      continue;
-    }
-    if (
-      cmd.auth &&
-      event.sender.role === "member" &&
-      !botConf.admin.includes(event.sender.user_id)
-    ) {
-      await replyGroupMsg(event, [
-        "您使用的命令需要群管理员权限，请联系群管理员。",
-      ]);
-      return;
-    }
-    cmd.plugin(msg, event);
-    return;
-  }
-  const intro = secondCmd
-    .map(
-      (cmd) =>
-        `功能：${cmd.name}\n说明：${cmd.comment}\n需要管理员权限:${
-          cmd.auth ? "是" : "否"
-        }`
-    )
-    .join("\n\n");
-  await replyGroupMsg(event, [intro]);
+  await secondCmd(`${botConf.trigger}订阅`, msg, cmdList, event);
 }
 
 //bot订阅 新增
-async function addSub(message: string, event: GroupMessageEvent) {
+async function subAdd(message: string, event: GroupMessageEvent) {
   const msg = msgNoCmd(message, ["新增"]).split(" ");
   if (msg.length === 0) {
     await replyGroupMsg(event, [
@@ -164,7 +140,7 @@ async function addSub(message: string, event: GroupMessageEvent) {
 }
 
 //bot订阅 取消
-async function removeSub(message: string, event: GroupMessageEvent) {
+async function subRemove(message: string, event: GroupMessageEvent) {
   const msg = msgNoCmd(message, ["取消"]).split(" ");
   if (msg.length === 0) {
     await replyGroupMsg(event, [

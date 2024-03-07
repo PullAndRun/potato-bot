@@ -39,9 +39,6 @@ schedule.scheduleJob(`0 0 */1 * * *`, async () => {
       }
       const news = await pushNews(group.group_id);
       if (news === undefined) {
-        await sendGroupMsg(getMasterBot(), group.group_id, [
-          `当前没有新闻，请稍后重试。`,
-        ]);
         return;
       }
       await sendGroupMsg(getMasterBot(), group.group_id, [
