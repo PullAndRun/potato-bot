@@ -68,7 +68,7 @@ async function biliBoard(message: string, event: GroupMessageEvent) {
   await replyGroupMsg(event, [
     `您查询的“${info.item}”商品信息：\n`,
     info.hq.average !== 0
-      ? `-高品质：\n  服务器：${info.hq.worldName}\n  均价：${info.hq.average}\n  现价：${info.hq.pricePerUnit}\n  数量：${info.hq.quantity}\n  总价：${info.hq.total}`
+      ? `-高品质：\n  服务器：${info.hq.worldName}\n  均价：${info.hq.average}\n  现价：${info.hq.pricePerUnit}\n  数量：${info.hq.quantity}\n  总价：${info.hq.total}\n`
       : "",
     info.nq.average !== 0
       ? `-普通品质：\n  服务器：${info.nq.worldName}\n  均价：${info.nq.average}\n  现价：${info.nq.pricePerUnit}\n  数量：${info.nq.quantity}\n  总价：${info.nq.total}`
