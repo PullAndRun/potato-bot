@@ -24,13 +24,14 @@ async function plugin(event: GroupMessageEvent) {
       name: "板子",
       comment: `使用“${botConf.trigger}ff14 板子 猫|猪|狗|鸟 商品名“命令查询所有服务器的市场布告板商品最低价格`,
       auth: false,
-      plugin: billBoard,
+      plugin: biliBoard,
     },
   ];
   await secondCmd(`${botConf.trigger}ff14`, msg, cmdList, event);
 }
 
-async function billBoard(message: string, event: GroupMessageEvent) {
+//botff14板子
+async function biliBoard(message: string, event: GroupMessageEvent) {
   const msg = msgNoCmd(message, ["板子"]);
   const gameServer = [
     ["猫", "猫小胖"],
@@ -38,10 +39,11 @@ async function billBoard(message: string, event: GroupMessageEvent) {
     ["狗", "豆豆柴"],
     ["鸟", "陆行鸟"],
   ];
-  const region = gameServer
-    .filter((server) => msg.startsWith(server[0] || ""))
-    .map((server) => server[0]);
+  const region = gameServer.filter((server) =>
+    msg.startsWith(server[0] || "")
+  )[0];
   if (
+    region === undefined ||
     region.length == 0 ||
     region[0] === undefined ||
     region[1] === undefined
