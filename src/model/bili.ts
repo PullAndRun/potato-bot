@@ -38,7 +38,7 @@ async function removeByName(name: string) {
   if (user === null) {
     return undefined;
   }
-  user.remove().catch((_) => undefined);
+  await user.remove().catch((_) => undefined);
   return user;
 }
 

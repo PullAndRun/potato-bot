@@ -44,7 +44,7 @@ async function updateSign(uin: number, gid: number) {
   const user = await findOrAddOne(uin, gid);
   user.sign = user.sign + 1;
   user.signTime = new Date();
-  user.save().catch((_) => undefined);
+  await user.save().catch((_) => undefined);
   return user;
 }
 
@@ -53,7 +53,7 @@ async function add(uin: number, gid: number) {
   user.uin = uin;
   user.gid = gid;
   user.sign = 0;
-  user.save().catch((_) => undefined);
+  await user.save().catch((_) => undefined);
   return user;
 }
 

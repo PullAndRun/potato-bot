@@ -46,7 +46,7 @@ async function add(gid: number, name: string, active: boolean) {
   plugin.gid = gid;
   plugin.name = name;
   plugin.active = active;
-  plugin.save().catch((_) => undefined);
+  await plugin.save().catch((_) => undefined);
   return plugin;
 }
 
@@ -64,7 +64,7 @@ async function pluginSwitch(gid: number, name: string, active: boolean) {
     return undefined;
   }
   plugin.active = active;
-  plugin.save().catch((_) => undefined);
+  await plugin.save().catch((_) => undefined);
   return plugin;
 }
 
