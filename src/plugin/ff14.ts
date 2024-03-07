@@ -40,15 +40,19 @@ async function billBoard(message: string, event: GroupMessageEvent) {
   ];
   const region = gameServer
     .filter((server) => msg.startsWith(server[0] || ""))
-    .map((server) => server[1])[0];
-  if (region === undefined) {
+    .map((server) => server[0]);
+  if (
+    region.length == 0 ||
+    region[0] === undefined ||
+    region[1] === undefined
+  ) {
     await replyGroupMsg(event, [
       `命令错误。请使用“${botConf.trigger}ff14”获取命令的正确使用方式。`,
     ]);
     return;
   }
-  const goods = msgNoCmd(msg, [region]);
-  const info = await goodsInfo(region, goods);
+  const goods = msgNoCmd(msg, [region[0]]);
+  const info = await goodsInfo(region[1], goods);
   if (info === undefined) {
     await replyGroupMsg(event, [
       `未查询到“${goods}”商品信息，请检查商品名是否正确。`,
