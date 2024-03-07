@@ -68,10 +68,10 @@ async function biliBoard(message: string, event: GroupMessageEvent) {
   await replyGroupMsg(event, [
     `您查询的“${info.item}”商品信息：\n`,
     info.hq.average !== 0
-      ? `-高品质：\n  服务器：${info.hq.worldName}\n  均价：${info.hq.average}\n  现价：${info.hq.pricePerUnit}\n  数量：${info.hq.quantity}\n  总价：${info.hq.total}\n`
+      ? `-高品质：\n  服务器：${info.hq.worldName}\n  卖家：${info.hq.retainerName}\n  均价：${info.hq.average}\n  现价：${info.hq.pricePerUnit}\n  数量：${info.hq.quantity}\n  总价：${info.hq.total}\n  税费：${info.hq.tax}\n`
       : "",
     info.nq.average !== 0
-      ? `-普通品质：\n  服务器：${info.nq.worldName}\n  均价：${info.nq.average}\n  现价：${info.nq.pricePerUnit}\n  数量：${info.nq.quantity}\n  总价：${info.nq.total}`
+      ? `-普通品质：\n  服务器：${info.nq.worldName}\n  卖家：${info.nq.retainerName}\n  均价：${info.nq.average}\n  现价：${info.nq.pricePerUnit}\n  数量：${info.nq.quantity}\n  总价：${info.nq.total}\n  税费：${info.nq.tax}`
       : "",
   ]);
 }
@@ -124,6 +124,8 @@ async function goodsInfo(region: string, goods: string) {
           worldName: z.string(),
           total: z.number(),
           quantity: z.number(),
+          retainerName: z.string(),
+          tax: z.number(),
         })
       )
       .min(1),
@@ -150,6 +152,8 @@ async function goodsInfo(region: string, goods: string) {
       total: stock.minPriceHQ?.total,
       pricePerUnit: stock.minPriceHQ?.pricePerUnit,
       quantity: stock.minPriceHQ?.quantity,
+      tax: stock.minPriceHQ?.tax,
+      retainerName: stock.minPriceHQ?.retainerName,
     },
     nq: {
       average: item.data.averagePriceNQ,
@@ -157,6 +161,8 @@ async function goodsInfo(region: string, goods: string) {
       total: stock.minPriceNQ?.total,
       pricePerUnit: stock.minPriceNQ?.pricePerUnit,
       quantity: stock.minPriceNQ?.quantity,
+      tax: stock.minPriceNQ?.tax,
+      retainerName: stock.minPriceNQ?.retainerName,
     },
   };
 }
