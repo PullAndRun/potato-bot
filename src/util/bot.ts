@@ -1,6 +1,7 @@
 import {
   Client,
   GroupMessageEvent,
+  MessageElem,
   Sendable,
   createClient,
 } from "@icqqjs/icqq";
@@ -116,10 +117,10 @@ async function sendGroupMsg(
 //回复群消息
 async function replyGroupMsg(
   event: GroupMessageEvent,
-  message: Sendable,
+  message: (string | MessageElem)[],
   quote: boolean = true
 ) {
-  return event.reply(message, quote).catch((_) => {
+  return event.reply([`\n`, ...message], quote).catch((_) => {
     logger.error(`\n错误：群消息回复失败\n消息内容：${message}`);
   });
 }
