@@ -73,7 +73,7 @@ async function plugins(message: string, event: GroupMessageEvent) {
       plugin: pluginsUpdate,
     },
   ];
-  await secondCmd(`${botConf.trigger}设置`, msg, cmdList, event);
+  await secondCmd(`${botConf.trigger}设置 插件`, msg, cmdList, event);
 }
 
 //bot设置 人格
@@ -105,7 +105,7 @@ async function ai(message: string, event: GroupMessageEvent) {
       plugin: aiRestoreName,
     },
   ];
-  await secondCmd(`${botConf.trigger}设置`, msg, cmdList, event);
+  await secondCmd(`${botConf.trigger}设置 人格`, msg, cmdList, event);
 }
 
 //bot设置 推送
@@ -125,7 +125,7 @@ async function push(message: string, event: GroupMessageEvent) {
       plugin: pushSwitch,
     },
   ];
-  await secondCmd(`${botConf.trigger}设置`, msg, cmdList, event);
+  await secondCmd(`${botConf.trigger}设置 推送`, msg, cmdList, event);
 }
 
 //bot设置 人格 列表
