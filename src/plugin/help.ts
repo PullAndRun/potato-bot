@@ -26,9 +26,9 @@ async function plugin(event: GroupMessageEvent) {
     page = maxPage;
   }
   await replyGroupMsg(event, [
-    `机器人使用说明书：\n`,
+    `\n机器人使用说明书：\n\n`,
     helpInfo.filter((_, i) => i >= (page - 1) * 6 && i < page * 6).join("\n\n"),
-    `您在第 ${page} 页，说明书共有 ${maxPage} 页`,
+    `\n\n您在第 ${page} 页，说明书共有 ${maxPage} 页\n`,
     `输入“${botConf.trigger}帮助 页码”进行翻页`,
   ]);
 }
