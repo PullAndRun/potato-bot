@@ -21,8 +21,8 @@ const info = {
 };
 
 const openai = new OpenAI({
-  apiKey: aiConf.account.apiKey,
-  baseURL: aiConf.account.baseURL,
+  apiKey: aiConf.account.sb.apiKey,
+  baseURL: aiConf.account.sb.baseURL,
 });
 
 //bot聊天内容
