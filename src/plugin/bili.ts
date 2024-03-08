@@ -42,7 +42,7 @@ schedule.scheduleJob(`0 0 0 */1 * *`, async () => {
   });
 });
 
-schedule.scheduleJob(`0 */5 * * * *`, async () => {
+schedule.scheduleJob(`0 */${biliConf.frequency} * * * *`, async () => {
   getMasterBot()
     .getGroupList()
     .forEach(async (group) => {
@@ -51,19 +51,18 @@ schedule.scheduleJob(`0 */5 * * * *`, async () => {
         "订阅推送",
         true
       );
-      if (pluginState === null) {
+      if (pluginState.active === false) {
         return;
       }
       const biliGroup = await biliModel.findByGid(group.group_id);
-      if (biliGroup.length === 0) {
-        return;
-      }
       biliGroup.forEach(async (bili) => {
         const live = await findLive(bili.rid);
         const dynamic = await findDynamic(bili.mid);
         if (
           live !== undefined &&
-          dayjs().subtract(5, "minute").isBefore(dayjs(live.pubDate))
+          dayjs()
+            .subtract(biliConf.frequency, "minute")
+            .isBefore(dayjs(live.pubDate))
         ) {
           await sendGroupMsg(getMasterBot(), bili.gid, [
             `【${bili.name}】正在直播！\n`,
@@ -73,7 +72,9 @@ schedule.scheduleJob(`0 */5 * * * *`, async () => {
         }
         if (
           dynamic &&
-          dayjs().subtract(5, "minute").isBefore(dayjs(dynamic.pubDate))
+          dayjs()
+            .subtract(biliConf.frequency, "minute")
+            .isBefore(dayjs(dynamic.pubDate))
         ) {
           await sendGroupMsg(getMasterBot(), bili.gid, [
             `【${bili.name}】 有新动态！\n`,

@@ -32,7 +32,6 @@ schedule.scheduleJob(`0 0 */4 * * *`, async () => {
       );
       const talkInfo = talkMap.get(group.group_id) || { time: new Date() };
       if (
-        pluginSwitch === undefined ||
         pluginSwitch.active === false ||
         dayjs().subtract(30, "minute").isBefore(dayjs(talkInfo.time))
       ) {

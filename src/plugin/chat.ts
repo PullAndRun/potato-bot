@@ -28,10 +28,7 @@ const openai = new OpenAI({
 //bot聊天内容
 async function plugin(event: GroupMessageEvent) {
   const msg = msgNoCmd(event.raw_message, [botConf.trigger, info.name]);
-  const group = await groupModel.findOne(event.group_id);
-  if (group === null) {
-    return;
-  }
+  const group = await groupModel.findOrAddOne(event.group_id);
   //自定义人格
   if (group.promptName === "自定义") {
     await replyGroupMsg(event, [await createChat(msg, group.customPrompt)]);
