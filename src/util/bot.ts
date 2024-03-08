@@ -115,7 +115,9 @@ async function sendGroupMsg(
     return undefined;
   }
   return client.sendGroupMsg(gid, message).catch((e) => {
-    logger.error(`\n错误：群消息发送失败\n消息内容：${message}\n原因：${e}`);
+    logger.error(
+      `\n错误：群消息发送失败\n消息内容：${message}\n原因：${JSON.stringify(e)}`
+    );
   });
 }
 
@@ -126,7 +128,9 @@ async function replyGroupMsg(
   quote: boolean = true
 ) {
   return event.reply([`\n`, ...message], quote).catch((e) => {
-    logger.error(`\n错误：群消息回复失败\n消息内容：${message}\n原因：${e}`);
+    logger.error(
+      `\n错误：群消息回复失败\n消息内容：${message}\n原因：${JSON.stringify(e)}`
+    );
   });
 }
 
