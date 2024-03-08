@@ -1,7 +1,6 @@
 import { GroupMessageEvent } from "@icqqjs/icqq";
 import botConf from "@potato/config/bot.json";
 import {
-  getBotByUin,
   getBots,
   getMasterBot,
   msgNoCmd,
