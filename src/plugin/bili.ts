@@ -16,6 +16,7 @@ import {
   sendGroupMsg,
 } from "../util/bot";
 import { createFetch } from "../util/http";
+import { sleep } from "../util/util";
 
 const info = {
   name: "订阅",
@@ -30,6 +31,7 @@ const info = {
 };
 
 schedule.scheduleJob(`0 0 0 */1 * *`, async () => {
+  await sleep(5000);
   const biliFindAll = await biliModel.findAll();
   biliFindAll.forEach(async (bili) => {
     if (bili.rid === 0) {
@@ -43,6 +45,7 @@ schedule.scheduleJob(`0 0 0 */1 * *`, async () => {
 });
 
 schedule.scheduleJob(`0 */${biliConf.frequency} * * * *`, async () => {
+  await sleep(5000);
   getMasterBot()
     .getGroupList()
     .forEach(async (group) => {

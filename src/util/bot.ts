@@ -108,7 +108,9 @@ async function sendGroupMsg(
 ) {
   if (client === undefined || client.getGroupList().get(gid) === undefined) {
     logger.error(
-      `\n错误：群消息发送失败\n消息内容：${message}\n原因： client.getGroupList().get(gid)：${client
+      `\n错误：群消息发送失败\n消息内容：${JSON.stringify(
+        message
+      )}\n原因： client.getGroupList().get(gid)：${client
         ?.getGroupList()
         .get(gid)}`
     );
@@ -116,7 +118,9 @@ async function sendGroupMsg(
   }
   return client.sendGroupMsg(gid, message).catch((e) => {
     logger.error(
-      `\n错误：群消息发送失败\n消息内容：${message}\n原因：${JSON.stringify(e)}`
+      `\n错误：群消息发送失败\n消息内容：${JSON.stringify(
+        message
+      )}\n原因：${JSON.stringify(e)}`
     );
   });
 }
