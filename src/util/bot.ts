@@ -107,10 +107,15 @@ async function sendGroupMsg(
   message: Sendable
 ) {
   if (client === undefined || client.getGroupList().get(gid) === undefined) {
+    logger.error(
+      `\n错误：群消息发送失败\n消息内容：${message}\n原因： client.getGroupList().get(gid)：${client
+        ?.getGroupList()
+        .get(gid)}`
+    );
     return undefined;
   }
-  return client.sendGroupMsg(gid, message).catch((_) => {
-    logger.error(`\n错误：群消息发送失败\n消息内容：${message}`);
+  return client.sendGroupMsg(gid, message).catch((e) => {
+    logger.error(`\n错误：群消息发送失败\n消息内容：${message}\n原因：${e}`);
   });
 }
 
@@ -120,8 +125,8 @@ async function replyGroupMsg(
   message: (string | MessageElem)[],
   quote: boolean = true
 ) {
-  return event.reply([`\n`, ...message], quote).catch((_) => {
-    logger.error(`\n错误：群消息回复失败\n消息内容：${message}`);
+  return event.reply([`\n`, ...message], quote).catch((e) => {
+    logger.error(`\n错误：群消息回复失败\n消息内容：${message}\n原因：${e}`);
   });
 }
 
