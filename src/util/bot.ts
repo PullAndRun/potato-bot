@@ -107,7 +107,7 @@ async function sendGroupMsg(
   message: Sendable
 ) {
   if (client === undefined || client.getGroupList().get(gid) === undefined) {
-    return;
+    return undefined;
   }
   return client.sendGroupMsg(gid, message).catch((_) => {
     logger.error(`\n错误：群消息发送失败\n消息内容：${message}`);
@@ -245,6 +245,10 @@ function getMasterBot() {
   return bot;
 }
 
+function getBotByUin(uin: number) {
+  return getBots().filter((client) => client.uin === uin)[0];
+}
+
 function groupInfo(gid: number) {
   return getMasterBot().getGroupList().get(gid);
 }
@@ -303,6 +307,7 @@ async function secondCmd(
 
 export {
   cleanupMsg,
+  getBotByUin,
   getBots,
   getMasterBot,
   groupInfo,

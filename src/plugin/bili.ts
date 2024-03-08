@@ -71,7 +71,7 @@ schedule.scheduleJob(`0 */${biliConf.frequency} * * * *`, async () => {
           ]);
         }
         if (
-          dynamic &&
+          dynamic !== undefined &&
           dayjs()
             .subtract(biliConf.frequency, "minute")
             .isBefore(dayjs(dynamic.pubDate))
