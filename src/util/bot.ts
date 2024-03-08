@@ -201,21 +201,19 @@ function listener() {
     });
     //管理员退群，机器人退群
     client.on("notice.group.decrease", async (event) => {
-      for (const admin of botConf.admin) {
-        if (
-          event.member?.user_id === admin ||
-          bots.map((bot) => bot?.uin).includes(event.member?.user_id)
-        ) {
-          for (const bot of bots) {
-            await bot?.setGroupLeave(event.group_id);
-          }
-          await sleep(5000);
-          await client.reloadGroupList();
-          await groupModel.updateDisableGroup(event.group_id);
-          logger.warn(
-            `\n警告：机器人账号 ${client.uin} 退出了群 ${event.group_id}`
-          );
+      if (
+        botConf.admin.includes(event.user_id) ||
+        bots.map((bot) => bot?.uin).includes(event.user_id)
+      ) {
+        for (const bot of bots) {
+          await bot?.setGroupLeave(event.group_id);
         }
+        await sleep(5000);
+        await client.reloadGroupList();
+        await groupModel.updateDisableGroup(event.group_id);
+        logger.warn(
+          `\n警告：机器人账号 ${client.uin} 退出了群 ${event.group_id}`
+        );
       }
     });
   });
