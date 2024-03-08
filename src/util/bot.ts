@@ -202,8 +202,13 @@ function listener() {
     //管理员退群，机器人退群
     client.on("notice.group.decrease", async (event) => {
       for (const admin of botConf.admin) {
-        if (event.operator_id === admin) {
-          await client.setGroupLeave(event.group_id);
+        if (
+          event.member?.user_id === admin ||
+          bots.map((bot) => bot?.uin).includes(event.member?.user_id)
+        ) {
+          for (const bot of bots) {
+            await bot?.setGroupLeave(event.group_id);
+          }
           await sleep(5000);
           await client.reloadGroupList();
           await groupModel.updateDisableGroup(event.group_id);
