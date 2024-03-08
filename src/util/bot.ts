@@ -198,6 +198,9 @@ function listener() {
       await client.reloadGroupList();
       await groupModel.findOrAddOne(event.group_id);
       await groupModel.updateActiveGroup(event.group_id);
+      logger.warn(
+        `\n机器人账号 ${client.uin} 加入了群 ${event.group_id} ${event.group_name}`
+      );
     });
     //管理员退群，机器人退群
     client.on("notice.group.decrease", async (event) => {
@@ -205,14 +208,12 @@ function listener() {
         botConf.admin.includes(event.user_id) ||
         bots.map((bot) => bot?.uin).includes(event.user_id)
       ) {
-        for (const bot of bots) {
-          await bot?.setGroupLeave(event.group_id);
-        }
+        await client.setGroupLeave(event.group_id);
         await sleep(5000);
         await client.reloadGroupList();
         await groupModel.updateDisableGroup(event.group_id);
         logger.warn(
-          `\n警告：机器人账号 ${client.uin} 退出了群 ${event.group_id}`
+          `\n机器人账号 ${client.uin} 退出了群 ${event.group_id} ${event.group.name}`
         );
       }
     });
