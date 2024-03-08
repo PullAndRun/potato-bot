@@ -106,7 +106,7 @@ async function sendGroupMsg(
   gid: number,
   message: Sendable
 ) {
-  if (client === undefined) {
+  if (client === undefined || client.getGroupList().get(gid) === undefined) {
     return;
   }
   return client.sendGroupMsg(gid, message).catch((_) => {
