@@ -120,7 +120,7 @@ async function sendGroupMsg(
     logger.error(
       `\n错误：群消息发送失败\n消息内容：${JSON.stringify(
         message
-      )}\n原因：${JSON.stringify(e)}`
+      )}\n群号：${gid}\n原因：${JSON.stringify(e)}`
     );
   });
 }
