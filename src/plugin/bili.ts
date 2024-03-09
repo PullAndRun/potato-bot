@@ -34,8 +34,6 @@ schedule.scheduleJob(`0 0 0 */1 * *`, async () => {
   const biliFindAll = await biliModel.findAll();
   biliFindAll.forEach(async (bili) => {
     if (bili.rid === 0) {
-      await findUser(bili.name);
-      await sleep(5000);
       const user = await findUser(bili.name);
       if (user === undefined || user.room_id === 0) {
         return;
@@ -59,11 +57,6 @@ schedule.scheduleJob(`0 */${biliConf.frequency} * * * *`, async () => {
       }
       const biliGroup = await biliModel.findByGid(group.group_id);
       biliGroup.forEach(async (bili) => {
-        //刷新rsshub缓存
-        await findLive(bili.rid);
-        await findDynamic(bili.mid);
-        await sleep(5000);
-        //取值
         const live = await findLive(bili.rid);
         const dynamic = await findDynamic(bili.mid);
         if (
