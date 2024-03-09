@@ -288,7 +288,10 @@ async function findDynamic(mid: number) {
   const dynamicItem = dynamicParse.data.rss.channel.item[0];
   return {
     ...dynamicItem,
-    description: cheerio.load(dynamicItem?.description || "空").text(),
+    description: cheerio
+      .load(dynamicItem?.description || "空")
+      .text()
+      .replaceAll("\n\n", "\n"),
   };
 }
 
