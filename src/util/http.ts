@@ -1,3 +1,5 @@
+import sharp from "sharp";
+
 async function createFetch(
   url: string,
   timeout: number = 5000,
@@ -26,4 +28,24 @@ async function fetchImage(
     .catch((_) => undefined);
 }
 
-export { createFetch, fetchImage };
+async function fetchImageMeta(url: string) {
+  const image = await fetchImage(url);
+  if (image === undefined) {
+    return undefined;
+  }
+  return sharp(image.toString("base64"))
+    .metadata()
+    .then((meta) => {
+      if (meta.width === undefined || meta.height === undefined) {
+        return undefined;
+      }
+      return {
+        image: image.toString("base64"),
+        width: meta.width,
+        height: meta.height,
+      };
+    })
+    .catch((_) => undefined);
+}
+
+export { createFetch, fetchImage, fetchImageMeta };

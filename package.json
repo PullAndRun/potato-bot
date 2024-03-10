@@ -16,16 +16,23 @@
     "dayjs": "^1.11.10",
     "decache": "^4.6.2",
     "fast-xml-parser": "^4.3.5",
+    "jpeg-js": "^0.4.4",
+    "jsqr": "^1.4.0",
     "NeteaseCloudMusicApi": "^4.15.5",
     "node-schedule": "^2.1.1",
     "openai": "^4.28.4",
     "pg": "^8.11.3",
+    "pngjs": "^7.0.0",
+    "qrcode": "^1.5.3",
+    "sharp": "^0.33.2",
     "ts-node": "^10.9.2",
     "typeorm": "^0.3.20",
     "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/node": "^20.11.24",
-    "@types/node-schedule": "^2.1.6"
+    "@types/node-schedule": "^2.1.6",
+    "@types/pngjs": "^6.0.4",
+    "@types/qrcode": "^1.5.5"
   }
 }

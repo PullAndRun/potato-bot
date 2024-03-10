@@ -2,6 +2,7 @@ import { GroupMessageEvent } from "@icqqjs/icqq";
 import botConf from "@potato/config/bot.json";
 import repeatConf from "@potato/config/repeat.json";
 import { getBots, sendGroupMsg } from "../util/bot";
+
 const info = {
   name: "复读",
   type: "plugin",

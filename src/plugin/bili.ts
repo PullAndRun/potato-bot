@@ -16,7 +16,6 @@ import {
   sendGroupMsg,
 } from "../util/bot";
 import { createFetch } from "../util/http";
-import { sleep } from "../util/util";
 
 const info = {
   name: "订阅",
