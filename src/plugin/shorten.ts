@@ -17,7 +17,7 @@ const info = {
   plugin: plugin,
 };
 
-//bot缩写展开
+//bot短链接
 async function plugin(event: GroupMessageEvent) {
   const msg = msgNoCmd(event.raw_message, [botConf.trigger, info.name]);
   if (msg === "") {
@@ -40,7 +40,7 @@ async function shorten(url: string) {
     }),
   })
     .then((resp) => resp?.json())
-    .catch((e) => console.log(e));
+    .catch((_) => undefined);
   const shortenSchema = z.object({
     url: z.string(),
   });
