@@ -222,7 +222,7 @@ async function pluginsDisable(message: string, event: GroupMessageEvent) {
 }
 
 //bot设置 插件 状态
-async function pluginsState(message: string, event: GroupMessageEvent) {
+async function pluginsState(_: string, event: GroupMessageEvent) {
   const state = await pluginModel.findByGid(event.group_id);
   if (state.length === 0) {
     await replyGroupMsg(event, [

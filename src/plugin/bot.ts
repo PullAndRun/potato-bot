@@ -46,7 +46,7 @@ async function plugin(event: GroupMessageEvent) {
 }
 
 async function groupLeave(message: string, event: GroupMessageEvent) {
-  const msg = msgNoCmd(event.raw_message, ["退群"]);
+  const msg = msgNoCmd(message, ["退群"]);
   const gid = isNaN(Number.parseFloat(msg))
     ? undefined
     : Number.parseFloat(msg);
@@ -61,7 +61,7 @@ async function groupLeave(message: string, event: GroupMessageEvent) {
 }
 
 async function broadCast(message: string, event: GroupMessageEvent) {
-  const msg = msgNoCmd(event.raw_message, ["广播"]);
+  const msg = msgNoCmd(message, ["广播"]);
   if (msg === "") {
     await replyGroupMsg(event, ["输入想要广播的消息"]);
     return;
