@@ -51,4 +51,4 @@ async function shorten(url: string) {
   return shortenResult.data.url;
 }
 
-export { info };
+export { info, shorten };
