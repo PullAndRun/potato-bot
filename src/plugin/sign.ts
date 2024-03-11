@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import * as userModel from "../model/user";
 import { replyGroupMsg } from "../util/bot";
 import { createFetch } from "../util/http";
+import signConf from "@potato/config/sign.json";
 
 const info = {
   name: "签到",
@@ -26,15 +27,13 @@ async function plugin(event: GroupMessageEvent) {
     event.sender.user_id,
     event.group_id
   );
-  const luckyWord = await createFetch(
-    "https://zh.moegirl.org.cn/index.php?title=Special:Random"
-  )
+  const luckyWord = await createFetch(signConf.api.luckyWord)
     .then((resp) => decodeURI(resp?.url.split("/").slice(-1).join("") || ""))
     .catch((_) => undefined);
   await replyGroupMsg(event, [
     `签到成功！您累积签到 ${updateResult.sign} 天\n`,
     luckyWord ? `您今天的幸运词是：${luckyWord}\n` : "",
-    luckyWord ? `关于幸运词：https://zh.moegirl.org.cn/${luckyWord}` : "",
+    luckyWord ? `关于幸运词：${signConf.api.moeGirl}${luckyWord}` : "",
   ]);
 }
 

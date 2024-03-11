@@ -4,6 +4,7 @@ import cloudMusic from "NeteaseCloudMusicApi";
 import { z } from "zod";
 import { msgNoCmd, replyGroupMsg } from "../util/bot";
 import { fetchImage } from "../util/http";
+import musicConf from "@potato/config/music.json";
 
 const info = {
   name: "点歌",
@@ -179,7 +180,7 @@ async function idsToDetail(ids: number) {
     })
     .catch((_) => undefined);
   return {
-    url: `https://music.163.com/#/song?id=${ids}`,
+    url: `${musicConf.api}${ids}`,
     name: song.name,
     singer: song.ar.map((ar) => ar.name).join("、"),
     album: {
