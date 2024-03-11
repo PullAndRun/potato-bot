@@ -8,6 +8,7 @@ import {
   secondCmd,
   sendGroupMsg,
 } from "../util/bot";
+import { sleep } from "../util/util";
 
 const info = {
   name: "机器人",
@@ -66,11 +67,10 @@ async function broadCast(message: string, event: GroupMessageEvent) {
     await replyGroupMsg(event, ["输入想要广播的消息"]);
     return;
   }
-  getMasterBot()
-    .getGroupList()
-    .forEach(async (group) => {
-      await sendGroupMsg(getMasterBot(), group.group_id, [msg]);
-    });
+  for (const [_, group] of getMasterBot().getGroupList().entries()) {
+    await sleep(1000);
+    await sendGroupMsg(getMasterBot(), group.group_id, [msg]);
+  }
   await replyGroupMsg(event, ["消息广播完成"]);
 }
 
