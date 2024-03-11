@@ -1,9 +1,9 @@
 import { GroupMessageEvent } from "@icqqjs/icqq";
-import botConf from "@potato/config/bot.json";
-import { msgNoCmd, replyGroupMsg } from "../util/bot";
 import abbrConf from "@potato/config/abbr.json";
-import { createFetch } from "../util/http";
+import botConf from "@potato/config/bot.json";
 import { z } from "zod";
+import { msgNoCmd, replyGroupMsg } from "../util/bot";
+import { createFetch } from "../util/http";
 
 const info = {
   name: "缩写展开",
@@ -29,7 +29,7 @@ async function plugin(event: GroupMessageEvent) {
     await replyGroupMsg(event, ["展开失败"]);
     return;
   }
-  await replyGroupMsg(event, ["展开的结果：\n", abbrResult]);
+  await replyGroupMsg(event, [`缩写“${msg}”展开的结果：\n`, abbrResult]);
 }
 
 async function translate(text: string) {
