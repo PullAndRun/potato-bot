@@ -59,11 +59,13 @@ async function topToIds() {
     status: z.number(),
     body: z.object({
       code: z.number(),
-      data: z.array(
-        z.object({
-          id: z.number(),
-        })
-      ),
+      data: z
+        .array(
+          z.object({
+            id: z.number(),
+          })
+        )
+        .min(1),
     }),
   });
   return cloudMusic
@@ -85,11 +87,13 @@ async function keywordToIds(keyword: string) {
     body: z.object({
       code: z.number(),
       result: z.object({
-        songs: z.array(
-          z.object({
-            id: z.number(),
-          })
-        ),
+        songs: z
+          .array(
+            z.object({
+              id: z.number(),
+            })
+          )
+          .min(1),
       }),
     }),
   });
@@ -120,7 +124,7 @@ async function idsToDetail(ids: number) {
           z.object({
             name: z.string(),
             al: z.object({ picUrl: z.string(), name: z.string() }),
-            ar: z.array(z.object({ name: z.string() })),
+            ar: z.array(z.object({ name: z.string() })).min(1),
           })
         )
         .min(1),

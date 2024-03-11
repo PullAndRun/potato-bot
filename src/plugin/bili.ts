@@ -195,13 +195,15 @@ async function findUser(userName: string) {
   }
   const userSchema = z.object({
     data: z.object({
-      result: z.array(
-        z.object({
-          uname: z.string(),
-          mid: z.number(),
-          room_id: z.number(),
-        })
-      ),
+      result: z
+        .array(
+          z.object({
+            uname: z.string(),
+            mid: z.number(),
+            room_id: z.number(),
+          })
+        )
+        .min(1),
     }),
   });
   const userParse = userSchema.safeParse(userInfo);
@@ -262,14 +264,16 @@ async function findDynamic(mid: number) {
   const dynamicSchema = z.object({
     rss: z.object({
       channel: z.object({
-        item: z.array(
-          z.object({
-            title: z.string(),
-            description: z.string(),
-            pubDate: z.string(),
-            link: z.string(),
-          })
-        ),
+        item: z
+          .array(
+            z.object({
+              title: z.string(),
+              description: z.string(),
+              pubDate: z.string(),
+              link: z.string(),
+            })
+          )
+          .min(1),
       }),
     }),
   });

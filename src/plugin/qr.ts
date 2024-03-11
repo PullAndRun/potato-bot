@@ -49,7 +49,7 @@ async function plugin(event: GroupMessageEvent) {
   if (msg) {
     const qrImage = await encode(msg);
     if (qrImage === undefined) {
-      await replyGroupMsg(event, [`生成二维码失败`]);
+      await replyGroupMsg(event, [`二维码生成失败`]);
       return;
     }
     await replyGroupMsg(event, [
