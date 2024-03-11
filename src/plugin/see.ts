@@ -66,3 +66,5 @@ async function search(text: string) {
   }
   return fetchImage(randomImage.thumbURL);
 }
+
+export { info };
