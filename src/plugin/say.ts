@@ -1,5 +1,6 @@
 import { GroupMessageEvent, segment } from "@icqqjs/icqq";
 import botConf from "@potato/config/bot.json";
+import sayConf from "@potato/config/say.json";
 import { z } from "zod";
 import {
   getMasterBot,
@@ -39,36 +40,32 @@ async function plugin(event: GroupMessageEvent) {
 }
 
 async function say(text: string) {
-  const audioUrl = await createFetch(
-    "https://v2.genshinvoice.top/run/predict",
-    5000,
-    {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        data: [
-          text,
-          "派蒙_ZH",
-          0.5,
-          0.6,
-          0.9,
-          1,
-          "ZH",
-          true,
-          1,
-          0.2,
-          null,
-          "Happy",
-          "",
-          0.7,
-        ],
-        event_data: null,
-        fn_index: 0,
-      }),
-    }
-  )
+  const audioUrl = await createFetch(sayConf.api.info, 5000, {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      data: [
+        text,
+        "派蒙_ZH",
+        0.5,
+        0.6,
+        0.9,
+        1,
+        "ZH",
+        true,
+        1,
+        0.2,
+        null,
+        "Happy",
+        "",
+        0.7,
+      ],
+      event_data: null,
+      fn_index: 0,
+    }),
+  })
     .then((resp) => resp?.json())
     .catch((_) => undefined);
   const audioUrlSchema = z.object({
@@ -83,7 +80,7 @@ async function say(text: string) {
   if (!safeAudioUrl.success || safeAudioUrl.data.data[0] !== "Success") {
     return undefined;
   }
-  return `https://v2.genshinvoice.top/file=${safeAudioUrl.data.data[1].name}`;
+  return `${sayConf.api.file}${safeAudioUrl.data.data[1].name}`;
 }
 
 export { info };
