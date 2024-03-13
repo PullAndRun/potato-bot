@@ -15,6 +15,7 @@ import { findActiveAccount } from "../model/qq.ts";
 import { setTalkTime } from "../plugin/talk.ts";
 import { logger } from "./logger.ts";
 import { sleep } from "./util.ts";
+import path from "path";
 
 const bots: Array<Client | undefined> = [];
 let masterBotUin: number | undefined = undefined;
@@ -48,9 +49,12 @@ schedule.scheduleJob(`0 */5 * * * *`, async () => {
 
 //登陆一个QQ账户
 async function loginOneAccount(uin: number, password: string, order: number) {
+  const ffmpegPath = path.resolve("data/resource/ffmpeg");
   const client = createClient({
     sign_api_addr: botConf.sign_api_addr,
     data_dir: botConf.data_dir,
+    ffmpeg_path: `${ffmpegPath}/ffmpeg`,
+    ffprobe_path: `${ffmpegPath}/ffprobe`,
     log_level: "error",
   });
   client

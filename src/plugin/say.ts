@@ -1,7 +1,12 @@
 import { GroupMessageEvent, segment } from "@icqqjs/icqq";
 import botConf from "@potato/config/bot.json";
 import { z } from "zod";
-import { msgNoCmd, replyGroupMsg } from "../util/bot";
+import {
+  getMasterBot,
+  msgNoCmd,
+  replyGroupMsg,
+  sendGroupMsg,
+} from "../util/bot";
 import { createFetch } from "../util/http";
 
 const info = {
@@ -30,7 +35,7 @@ async function plugin(event: GroupMessageEvent) {
     await replyGroupMsg(event, ["说话失败"]);
     return;
   }
-  await replyGroupMsg(event, [segment.record(audio)]);
+  await sendGroupMsg(getMasterBot(), event.group_id, [segment.record(audio)]);
 }
 
 async function say(text: string) {

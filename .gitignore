@@ -7,3 +7,4 @@
 test*.*
 /tools
 /data/bot
+/data/resource/ffmpeg/*
