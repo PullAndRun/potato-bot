@@ -40,7 +40,7 @@ async function plugin(event: GroupMessageEvent) {
 }
 
 async function say(text: string) {
-  const audioUrl = await createFetch(sayConf.api.info, 5000, {
+  const audioUrl = await createFetch(sayConf.api.info, 20000, {
     method: "post",
     headers: {
       "Content-Type": "application/json",

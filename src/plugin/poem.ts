@@ -39,7 +39,11 @@ async function poem() {
     title: string;
   }> = JSON.parse(file.toString());
   const result = poems[Math.floor(Math.random() * poems.length)];
-  if (result === undefined || result.paragraphs.length === 0) {
+  if (
+    result === undefined ||
+    result.paragraphs.length === 0 ||
+    result.paragraphs.length > 6
+  ) {
     return poem();
   }
   return result;
