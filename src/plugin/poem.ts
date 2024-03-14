@@ -22,11 +22,12 @@ async function plugin(event: GroupMessageEvent) {
   if (prompt === null) {
     return;
   }
-  const sameText = await createChat(
-    `《${text.title}》\n原作者：${text.author}\n${text.paragraphs.join("")}`,
-    prompt.prompt
-  );
-  await replyGroupMsg(event, [sameText]);
+  const sameText = await createChat(text.paragraphs.join(""), prompt.prompt);
+  await replyGroupMsg(event, [
+    `《${text.title}》\n`,
+    `原作者：${text.author}\n`,
+    sameText,
+  ]);
 }
 
 async function poem() {
