@@ -83,4 +83,4 @@ async function chat(msg: ChatCompletionMessageParam[]) {
   return response.replace(/^(\n+)/g, "").replace(/\n+/g, "\n");
 }
 
-export { info };
+export { info, createChat };

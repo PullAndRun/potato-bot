@@ -1,9 +1,10 @@
-import { GroupMessageEvent, segment } from "@icqqjs/icqq";
+import { GroupMessageEvent } from "@icqqjs/icqq";
 import botConf from "@potato/config/bot.json";
 import fs from "fs/promises";
 import path from "path";
-import { getMasterBot, replyGroupMsg, sendGroupMsg } from "../util/bot";
-import { say } from "./say";
+import * as aiModel from "../model/ai";
+import { replyGroupMsg } from "../util/bot";
+import { createChat } from "./chat";
 
 const info = {
   name: "吟诗",
@@ -17,14 +18,15 @@ const info = {
 //bot吟诗
 async function plugin(event: GroupMessageEvent) {
   const text = await poem();
-  const audio = await say(
-    `${text.title}，${text.author}，${text.paragraphs.join("，")}`
-  );
-  if (audio === undefined) {
-    await replyGroupMsg(event, ["吟诗失败"]);
+  const prompt = await aiModel.findOne("二创诗人");
+  if (prompt === null) {
     return;
   }
-  await sendGroupMsg(getMasterBot(), event.group_id, [segment.record(audio)]);
+  const sameText = await createChat(
+    `《${text.title}》\n原作者：${text.author}\n${text.paragraphs.join("")}`,
+    prompt.prompt
+  );
+  await replyGroupMsg(event, [sameText]);
 }
 
 async function poem() {
@@ -39,11 +41,7 @@ async function poem() {
     title: string;
   }> = JSON.parse(file.toString());
   const result = poems[Math.floor(Math.random() * poems.length)];
-  if (
-    result === undefined ||
-    result.paragraphs.length === 0 ||
-    result.paragraphs.length > 6
-  ) {
+  if (result === undefined || result.paragraphs.length === 0) {
     return poem();
   }
   return result;
