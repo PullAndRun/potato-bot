@@ -11,7 +11,7 @@ const info = {
   type: "plugin",
   defaultActive: true,
   passive: false,
-  comment: [`说明：吟一首唐诗`, `使用“${botConf.trigger}吟诗”命令吟一首唐诗`],
+  comment: [`说明：AI改写一首诗`, `使用“${botConf.trigger}吟诗”命令吟一首诗`],
   plugin: plugin,
 };
 
@@ -25,7 +25,7 @@ async function plugin(event: GroupMessageEvent) {
   const sameText = await createChat(text.paragraphs.join(""), prompt.prompt);
   await replyGroupMsg(event, [
     `《${text.title}》\n`,
-    `原作者：${text.author}\n`,
+    `原著：${text.author}\n`,
     sameText,
   ]);
 }
