@@ -17,10 +17,6 @@ const info = {
 //bot吟诗
 async function plugin(event: GroupMessageEvent) {
   const text = await poem();
-  if (text === undefined) {
-    await replyGroupMsg(event, ["吟诗失败"]);
-    return;
-  }
   const audio = await say(
     `${text.title}，${text.author}，${text.paragraphs.join("，")}`
   );
@@ -42,7 +38,11 @@ async function poem() {
     paragraphs: Array<string>;
     title: string;
   }> = JSON.parse(file.toString());
-  return poems[Math.floor(Math.random() * poems.length)];
+  const result = poems[Math.floor(Math.random() * poems.length)];
+  if (result === undefined || result.paragraphs.length === 0) {
+    return poem();
+  }
+  return result;
 }
 
 export { info };
