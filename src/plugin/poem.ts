@@ -22,7 +22,7 @@ async function plugin(event: GroupMessageEvent) {
   if (prompt === null) {
     return;
   }
-  const sameText = await createChat(text.paragraphs.join("\n"), prompt.prompt);
+  const sameText = await createChat(text.paragraphs.join(""), prompt.prompt);
   await replyGroupMsg(event, [
     `《${text.title}》\n`,
     `作者：${text.author}\n`,
