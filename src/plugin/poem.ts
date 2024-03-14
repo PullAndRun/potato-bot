@@ -26,8 +26,9 @@ async function plugin(event: GroupMessageEvent) {
   await replyGroupMsg(event, [
     `《${text.title}》\n`,
     `作者：${text.author}\n`,
-    `原文：${text.paragraphs.join("\n")}\n——\n`,
-    `AI仿写：`,
+    `原文：\n`,
+    `${text.paragraphs.join("\n")}\n——\n`,
+    `AI仿写：\n`,
     sameText,
   ]);
 }
