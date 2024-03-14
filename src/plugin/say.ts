@@ -48,7 +48,7 @@ async function say(text: string) {
     body: JSON.stringify({
       data: [
         text,
-        "派蒙_ZH",
+        "帕姆_ZH",
         0.5,
         0.6,
         0.9,
