@@ -48,15 +48,15 @@ async function say(text: string) {
     body: JSON.stringify({
       data: [
         text,
-        "派蒙_ZH",
+        "三月七_ZH",
         0.5,
         0.6,
         0.9,
         1,
         "ZH",
         true,
-        1.5,
         1,
+        0.7,
         null,
         "Happy",
         "",
