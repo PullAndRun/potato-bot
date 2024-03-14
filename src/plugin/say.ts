@@ -83,4 +83,4 @@ async function say(text: string) {
   return `${sayConf.api.file}${safeAudioUrl.data.data[1].name}`;
 }
 
-export { info };
+export { info, say };

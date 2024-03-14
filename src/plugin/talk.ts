@@ -1,5 +1,5 @@
 import { GroupMessageEvent } from "@icqqjs/icqq";
-import talkJson from "@potato/resource/talk.json";
+import talkJson from "@potato/resource/talk/talk.json";
 import dayjs from "dayjs";
 import schedule from "node-schedule";
 import * as pluginModel from "../model/plugin";
