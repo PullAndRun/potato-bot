@@ -12,7 +12,10 @@ const info = {
   type: "plugin",
   defaultActive: true,
   passive: false,
-  comment: [`说明：AI改写一首诗`, `使用“${botConf.trigger}吟诗”命令吟一首诗`],
+  comment: [
+    `说明：吟一首诗，然后赏析它。`,
+    `使用“${botConf.trigger}吟诗”命令吟一首诗`,
+  ],
   plugin: plugin,
 };
 
