@@ -23,17 +23,16 @@ async function plugin(event: GroupMessageEvent) {
   if (prompt === null) {
     return;
   }
-  const sameText = await createChat(text.paragraphs.join("\n"), prompt.prompt);
   const poemText = [
     `《${text.title}》\n`,
     `作者：${text.author}\n`,
     `诗文：\n`,
-    `${text.paragraphs.join("\n")}\n——\n`,
-    `AI赏析：\n`,
-    sameText,
+    `${text.paragraphs.join("\n")}`,
   ];
-  await replyGroupMsg(event, poemText);
-  const audio = await say(sameText);
+  const apperText = await createChat(poemText.join("\n"), prompt.prompt);
+  const finalText = [...poemText, `\n——\n`, `AI赏析：\n`, apperText];
+  await replyGroupMsg(event, finalText);
+  const audio = await say(apperText);
   if (audio === undefined) {
     return;
   }
