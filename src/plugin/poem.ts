@@ -19,7 +19,7 @@ const info = {
 //bot吟诗
 async function plugin(event: GroupMessageEvent) {
   const text = await poem();
-  const prompt = await aiModel.findOne("二创诗人");
+  const prompt = await aiModel.findOne("诗歌赏析");
   if (prompt === null) {
     return;
   }
@@ -27,13 +27,13 @@ async function plugin(event: GroupMessageEvent) {
   const poemText = [
     `《${text.title}》\n`,
     `作者：${text.author}\n`,
-    `原文：\n`,
+    `诗文：\n`,
     `${text.paragraphs.join("\n")}\n——\n`,
-    `AI仿写：\n`,
+    `AI赏析：\n`,
     sameText,
   ];
   await replyGroupMsg(event, poemText);
-  const audio = await say(poemText.join(""));
+  const audio = await say(sameText);
   if (audio === undefined) {
     return;
   }
