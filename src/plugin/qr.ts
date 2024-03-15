@@ -6,7 +6,7 @@ import pngjs from "pngjs";
 import qrcode from "qrcode";
 import sharp from "sharp";
 import { msgNoCmd, replyGroupMsg } from "../util/bot";
-import { fetchImage } from "../util/http";
+import { fetchBuffer } from "../util/http";
 
 const info = {
   name: "二维码",
@@ -33,7 +33,7 @@ async function plugin(event: GroupMessageEvent) {
     return;
   }
   if (qrimg && qrimg.url) {
-    const imageBase64 = await fetchImage(qrimg.url);
+    const imageBase64 = await fetchBuffer(qrimg.url);
     if (imageBase64 === undefined) {
       await replyGroupMsg(event, [`二维码解析失败`]);
       return;

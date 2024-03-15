@@ -14,7 +14,7 @@ async function createFetch(
   );
 }
 
-async function fetchImage(
+async function fetchBuffer(
   url: string,
   timeout: number = 5000,
   requestInit: RequestInit = {}
@@ -28,8 +28,8 @@ async function fetchImage(
     .catch((_) => undefined);
 }
 
-async function fetchImageMeta(url: string) {
-  const image = await fetchImage(url);
+async function fetchImage(url: string) {
+  const image = await fetchBuffer(url);
   if (image === undefined) {
     return undefined;
   }
@@ -48,4 +48,4 @@ async function fetchImageMeta(url: string) {
     .catch((_) => undefined);
 }
 
-export { createFetch, fetchImage, fetchImageMeta };
+export { createFetch, fetchBuffer, fetchImage };

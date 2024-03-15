@@ -1,6 +1,6 @@
 import { GroupMessageEvent, segment } from "@icqqjs/icqq";
 import botConf from "@potato/config/bot.json";
-import { createFetch, fetchImage } from "../util/http";
+import { createFetch, fetchBuffer } from "../util/http";
 import seeConf from "@potato/config/see.json";
 import { z } from "zod";
 import { msgNoCmd, replyGroupMsg } from "../util/bot";
@@ -64,7 +64,7 @@ async function search(text: string) {
   if (randomImage === undefined) {
     return undefined;
   }
-  return fetchImage(randomImage.thumbURL);
+  return fetchBuffer(randomImage.thumbURL);
 }
 
 export { info };

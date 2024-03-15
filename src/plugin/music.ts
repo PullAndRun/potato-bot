@@ -3,7 +3,7 @@ import botConf from "@potato/config/bot.json";
 import cloudMusic from "NeteaseCloudMusicApi";
 import { z } from "zod";
 import { msgNoCmd, replyGroupMsg } from "../util/bot";
-import { fetchImage } from "../util/http";
+import { fetchBuffer } from "../util/http";
 import musicConf from "@potato/config/music.json";
 
 const info = {
@@ -185,7 +185,7 @@ async function idsToDetail(ids: number) {
     singer: song.ar.map((ar) => ar.name).join("、"),
     album: {
       pic: `base64://${(
-        (await fetchImage(song.al.picUrl)) || Buffer.from("")
+        (await fetchBuffer(song.al.picUrl)) || Buffer.from("")
       ).toString("base64")}`,
       name: song.al.name,
     },
