@@ -22,6 +22,26 @@ docker run \
     node /bin/bash \
     -c "cd /data && npm run prod"
 
+--rsshub容器
+docker run \
+    --name rsshub \
+    --restart=always \
+    -d \
+    -p change-this:1200 \
+    --network change-this \
+    diygod/rsshub
+
+--qsign容器
+docker run \
+    --name qsign \
+    --restart=always \
+    -d \
+    -p change-this:8080 \
+    --network change-this \
+    -e BASE_PATH=/txlib/8.9.78 \
+    -v change-this:/txlib/8.9.78 \
+    xzhouqd/qsign:core-1.1.9
+
 ---容器网络
 docker network create change-this
 
