@@ -1,10 +1,11 @@
-import { GroupMessageEvent } from "@icqqjs/icqq";
+import { GroupMessageEvent, segment } from "@icqqjs/icqq";
 import botConf from "@potato/config/bot.json";
 import fs from "fs/promises";
 import path from "path";
 import * as aiModel from "../model/ai";
-import { replyGroupMsg } from "../util/bot";
+import { getMasterBot, replyGroupMsg, sendGroupMsg } from "../util/bot";
 import { createChat } from "./chat";
+import { say } from "./say";
 
 const info = {
   name: "吟诗",
@@ -23,14 +24,20 @@ async function plugin(event: GroupMessageEvent) {
     return;
   }
   const sameText = await createChat(text.paragraphs.join("\n"), prompt.prompt);
-  await replyGroupMsg(event, [
+  const poemText = [
     `《${text.title}》\n`,
     `作者：${text.author}\n`,
     `原文：\n`,
     `${text.paragraphs.join("\n")}\n——\n`,
     `AI仿写：\n`,
     sameText,
-  ]);
+  ];
+  await replyGroupMsg(event, poemText);
+  const audio = await say(poemText.join(""));
+  if (audio === undefined) {
+    return;
+  }
+  await sendGroupMsg(getMasterBot(), event.group_id, [segment.record(audio)]);
 }
 
 async function poem() {
