@@ -48,7 +48,7 @@ async function say(text: string) {
     body: JSON.stringify({
       data: [
         text,
-        "三月七_ZH",
+        "流萤_ZH",
         0.5,
         0.6,
         0.9,
