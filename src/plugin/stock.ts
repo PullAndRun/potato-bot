@@ -37,19 +37,19 @@ async function plugin(event: GroupMessageEvent) {
     },
     {
       name: "背包",
-      auth: true,
+      auth: false,
       comment: `使用“${botConf.trigger}股票 背包“命令查看您的资产。`,
       plugin: bag,
     },
     {
       name: "还原",
-      auth: true,
+      auth: false,
       comment: `使用“${botConf.trigger}股票 还原“命令清空您拥有的所有股票并重置资产为1000元。`,
       plugin: restore,
     },
     {
       name: "榜单",
-      auth: true,
+      auth: false,
       comment: `使用“${botConf.trigger}股票 榜单“命令查看本群资产前10名玩家。`,
       plugin: rank,
     },
