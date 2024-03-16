@@ -267,7 +267,13 @@ async function rank(_: string, event: GroupMessageEvent) {
         event.group_id,
         user.uin
       );
-      return `${member.nickname} 拥有 ${user.stockCoin.toFixed(2)} 金币`;
+      let coin = 0;
+      const stock = await stockModel.findOrAddOne(user.uin, event.group_id);
+      stock.stock.forEach((sto) => {
+        coin += sto.number * sto.price;
+      });
+      coin += user.stockCoin;
+      return `${member.nickname} 拥有 ${coin.toFixed(2)} 金币`;
     })
   );
   await replyGroupMsg(event, [
