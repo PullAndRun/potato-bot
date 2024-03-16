@@ -90,7 +90,7 @@ async function buy(message: string, event: GroupMessageEvent) {
     per > 100
   ) {
     await replyGroupMsg(event, [
-      `命令错误！请使用“${botConf.trigger}股票 买 股票名 您剩余资金的百分比(0-100)”命令购买一种股票。\n`,
+      `命令错误！请使用“${botConf.trigger}股票 买 股票名或代码 您剩余资金的百分比(0-100)”命令购买一种股票。\n`,
       `注意“股票名”和“剩余资金百分比”需要用空格分隔。`,
     ]);
     return;
@@ -106,7 +106,7 @@ async function buy(message: string, event: GroupMessageEvent) {
   const stock = await find(stockName);
   if (stock === undefined) {
     await replyGroupMsg(event, [
-      `未查询到名为”${stockName}“的股票，请检查股票名。\n也可能是网络卡顿，如股票名正确，请稍后重试。`,
+      `未查询到名为”${stockName}“的股票，请检查股票名或股票代码是否正确。\n也可能是网络卡顿，如股票名正确，请稍后重试。`,
     ]);
     return;
   }
@@ -151,15 +151,15 @@ async function sell(message: string, event: GroupMessageEvent) {
     per > 100
   ) {
     await replyGroupMsg(event, [
-      `命令错误！请使用“${botConf.trigger}股票 卖 股票名 您剩余股票的百分比(0-100)”命令出售一种股票。\n`,
-      `注意“股票名”和“剩余股票数量”需要用空格分隔。`,
+      `命令错误！请使用“${botConf.trigger}股票 卖 股票代码 您剩余股票的百分比(0-100)”命令出售一种股票。\n`,
+      `注意“股票代码”和“剩余股票数量”需要用空格分隔。`,
     ]);
     return;
   }
   const stock = await find(code);
   if (stock === undefined) {
     await replyGroupMsg(event, [
-      `未查询到名为”${code}“的股票，请检查股票名。\n也可能是网络卡顿，如股票名正确，请稍后重试。`,
+      `未查询到代码为”${code}“的股票，请到背包检查股票代码。\n也可能是网络卡顿，如股票名正确，请稍后重试。`,
     ]);
     return;
   }
@@ -169,7 +169,9 @@ async function sell(message: string, event: GroupMessageEvent) {
     code
   );
   if (findStock === undefined) {
-    await replyGroupMsg(event, [`您没有代码为“${code}“的股票。`]);
+    await replyGroupMsg(event, [
+      `您没有代码为“${code}“的股票。请到背包检查股票代码。`,
+    ]);
     return;
   }
   const saleNum = Math.floor(findStock.number * (per / 100));
