@@ -23,6 +23,9 @@ class User extends BaseEntity {
 
   @Column({ type: "date", comment: "签到时间", nullable: true })
   signTime: Date;
+
+  @Column({ type: "float", comment: "股票金币", default: 1000 })
+  stockCoin: number;
 }
 
 function findOne(gid: number, uin: number) {
@@ -38,6 +41,13 @@ async function findOrAddOne(uin: number, gid: number) {
     return add(uin, gid);
   }
   return user;
+}
+
+async function stockRank(gid: number) {
+  return User.find({
+    where: { gid: gid },
+    order: { stockCoin: "DESC" },
+  });
 }
 
 async function updateSign(uin: number, gid: number) {
@@ -57,4 +67,4 @@ async function add(uin: number, gid: number) {
   return user;
 }
 
-export { User, add, findOne, findOrAddOne, updateSign };
+export { User, add, findOne, findOrAddOne, stockRank, updateSign };
