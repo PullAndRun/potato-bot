@@ -21,6 +21,7 @@ class Stock extends BaseEntity {
   @Column({ type: "json", comment: "股票", default: [] })
   stock: Array<{
     name: string;
+    code: string;
     number: number;
     price: number;
   }>;
@@ -33,14 +34,15 @@ async function findOne(uin: number, gid: number) {
   });
 }
 
-async function findOneByStockName(uin: number, gid: number, stockName: string) {
+async function findOneByCode(uin: number, gid: number, code: string) {
   const userStock = await findOrAddOne(uin, gid);
-  return userStock.stock.filter((stock) => stock.name === stockName)[0];
+  return userStock.stock.filter((stock) => stock.code === code)[0];
 }
 
 async function updateStock(
   uin: number,
   gid: number,
+  code: string,
   stockName: string,
   stockNumber: number,
   stockPrice: number = 0
@@ -52,6 +54,7 @@ async function updateStock(
   if (existStock.length === 0 && stockNumber > 0) {
     userStock.stock.push({
       name: stockName,
+      code: code,
       number: stockNumber,
       price: stockPrice,
     });
@@ -101,4 +104,4 @@ async function add(uin: number, gid: number) {
   return stock;
 }
 
-export { Stock, findOneByStockName, findOrAddOne, updateStock };
+export { Stock, findOneByCode, findOrAddOne, updateStock };

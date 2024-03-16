@@ -73,7 +73,9 @@ async function search(message: string, event: GroupMessageEvent) {
     ]);
     return;
   }
-  await replyGroupMsg(event, [`股票 ${msg} 的价格：${stock.price}`]);
+  await replyGroupMsg(event, [
+    `股票： ${msg} 代码：${stock.code} 的价格：${stock.price}`,
+  ]);
 }
 
 //bot股票 买
@@ -123,6 +125,7 @@ async function buy(message: string, event: GroupMessageEvent) {
   await stockModel.updateStock(
     event.sender.user_id,
     event.group_id,
+    stock.code,
     stock.name,
     buyNum,
     stock.price
@@ -158,10 +161,10 @@ async function sell(message: string, event: GroupMessageEvent) {
     ]);
     return;
   }
-  const findStock = await stockModel.findOneByStockName(
+  const findStock = await stockModel.findOneByCode(
     event.sender.user_id,
     event.group_id,
-    stock.name
+    stock.code
   );
   if (findStock === undefined) {
     await replyGroupMsg(event, [`您没有名为“${stock.name}“的股票。`]);
@@ -181,6 +184,7 @@ async function sell(message: string, event: GroupMessageEvent) {
   await stockModel.updateStock(
     event.sender.user_id,
     event.group_id,
+    stock.code,
     stock.name,
     saleNum * -1
   );
@@ -207,9 +211,9 @@ async function bag(_: string, event: GroupMessageEvent) {
     findStock.stock.map(async (stock) => {
       const price = await find(stock.name);
       if (price === undefined) {
-        return `-${stock.name}\n 数量：${stock.number}\n 均价：${stock.price}\n 现价：获取失败`;
+        return `-${stock.name}\n 代码：${stock.code}\n 数量：${stock.number}\n 均价：${stock.price}\n 现价：获取失败`;
       }
-      return `-${stock.name}\n 数量：${
+      return `-${stock.name}\n 代码：${stock.code}\n 数量：${
         stock.number
       }\n 均价：${stock.price.toFixed(2)}\n 现价：${price.price.toFixed(
         2
@@ -279,6 +283,7 @@ async function find(name: string) {
           z.object({
             name: z.string(),
             price: z.string(),
+            code: z.string(),
           })
         )
         .min(1),
@@ -290,6 +295,7 @@ async function find(name: string) {
   }
   return {
     name: safeStock.data.Result.stock[0].name,
+    code: safeStock.data.Result.stock[0].code,
     price: Number.parseFloat(safeStock.data.Result.stock[0].price),
   };
 }
