@@ -74,7 +74,7 @@ async function search(message: string, event: GroupMessageEvent) {
     return;
   }
   await replyGroupMsg(event, [
-    `股票： ${msg} 代码：${stock.code} 的价格：${stock.price}`,
+    `股票： ${msg} \n代码：${stock.code} \n价格：${stock.price}`,
   ]);
 }
 
@@ -110,7 +110,9 @@ async function buy(message: string, event: GroupMessageEvent) {
     ]);
     return;
   }
-  const hasStock = findStock.stock.filter((stock) => stock.name === stockName);
+  const hasStock = findStock.stock.filter(
+    (stocks) => stocks.code === stock.code
+  );
   if (findStock.stock.length === 5 && hasStock.length === 0) {
     await replyGroupMsg(event, [`您最多购买5种股票，您已经购买了5种股票`]);
     return;
@@ -139,10 +141,10 @@ async function buy(message: string, event: GroupMessageEvent) {
 
 //bot股票 卖
 async function sell(message: string, event: GroupMessageEvent) {
-  const [stockName, perStr] = msgNoCmd(message, ["卖"]).split(" ");
+  const [code, perStr] = msgNoCmd(message, ["卖"]).split(" ");
   const per = Number.parseInt(perStr || "");
   if (
-    stockName === undefined ||
+    code === undefined ||
     perStr === undefined ||
     isNaN(per) ||
     per <= 0 ||
@@ -154,20 +156,20 @@ async function sell(message: string, event: GroupMessageEvent) {
     ]);
     return;
   }
-  const stock = await find(stockName);
+  const stock = await find(code);
   if (stock === undefined) {
     await replyGroupMsg(event, [
-      `未查询到名为”${stockName}“的股票，请检查股票名。\n也可能是网络卡顿，如股票名正确，请稍后重试。`,
+      `未查询到名为”${code}“的股票，请检查股票名。\n也可能是网络卡顿，如股票名正确，请稍后重试。`,
     ]);
     return;
   }
   const findStock = await stockModel.findOneByCode(
     event.sender.user_id,
     event.group_id,
-    stock.code
+    code
   );
   if (findStock === undefined) {
-    await replyGroupMsg(event, [`您没有名为“${stock.name}“的股票。`]);
+    await replyGroupMsg(event, [`您没有代码为“${code}“的股票。`]);
     return;
   }
   const saleNum = Math.floor(findStock.number * (per / 100));
