@@ -63,7 +63,6 @@ async function updateStock(
     if (
       stock.name !== stockName ||
       stockNumber === 0 ||
-      stockPrice === 0 ||
       (stockNumber < 0 && Math.abs(stockNumber) > stock.number)
     ) {
       continue;
