@@ -223,18 +223,18 @@ async function rank(_: string, event: GroupMessageEvent) {
     await replyGroupMsg(event, [`本群没人炒股`]);
     return;
   }
+  const rankList = await Promise.all(
+    rank.map(async (user) => {
+      const member = await getMasterBot().getGroupMemberInfo(
+        event.group_id,
+        user.uin
+      );
+      return `${member.nickname} 拥有 ${user.stockCoin.toFixed(2)} 金币`;
+    })
+  );
   await replyGroupMsg(event, [
     `财富榜前10名玩家：\n`,
-    rank
-      .map(async (user) => {
-        const member = await getMasterBot().getGroupMemberInfo(
-          event.group_id,
-          user.uin
-        );
-        return `${member.nickname} 拥有 ${user.stockCoin.toFixed(2)} 金币`;
-      })
-      .filter((_, i) => i < 10)
-      .join("\n"),
+    rankList.filter((_, i) => i < 10).join("\n"),
   ]);
 }
 
