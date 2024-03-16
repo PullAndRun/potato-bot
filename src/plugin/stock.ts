@@ -31,13 +31,13 @@ async function plugin(event: GroupMessageEvent) {
     },
     {
       name: "买",
-      comment: `使用“${botConf.trigger}股票 买 股票名称 您剩余资金的百分比（0-100）“命令购买一种股票。`,
+      comment: `使用“${botConf.trigger}股票 买 股票名称或代码 您剩余资金的百分比（0-100）“命令购买一种股票。`,
       auth: false,
       plugin: buy,
     },
     {
       name: "卖",
-      comment: `使用“${botConf.trigger}股票 卖 股票名称 您剩余股票的百分比（0-100）“命令出售一种股票。`,
+      comment: `使用“${botConf.trigger}股票 卖 股票代码 您剩余股票的百分比（0-100）“命令出售一种股票。`,
       auth: false,
       plugin: sell,
     },
