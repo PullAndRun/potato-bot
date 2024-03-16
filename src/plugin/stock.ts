@@ -175,18 +175,20 @@ async function bag(_: string, event: GroupMessageEvent) {
     event.sender.user_id,
     event.group_id
   );
-  const stock = findStock.stock.map(async (stock) => {
-    const price = await find(stock.name);
-    if (price === undefined) {
-      return `-${stock.name}\n 均价：${stock.price}\n 现价：获取失败`;
-    }
-    return `-${stock.name}\n 均价：${stock.price.toFixed(
-      2
-    )}\n 现价：${price.price.toFixed(2)} \n涨幅：${(
-      ((price.price - stock.price) / stock.price) *
-      100
-    ).toFixed(2)}%`;
-  });
+  const stock = await Promise.all(
+    findStock.stock.map(async (stock) => {
+      const price = await find(stock.name);
+      if (price === undefined) {
+        return `-${stock.name}\n 均价：${stock.price}\n 现价：获取失败`;
+      }
+      return `-${stock.name}\n 均价：${stock.price.toFixed(
+        2
+      )}\n 现价：${price.price.toFixed(2)} \n涨幅：${(
+        ((price.price - stock.price) / stock.price) *
+        100
+      ).toFixed(2)}%`;
+    })
+  );
   await replyGroupMsg(event, [
     `您的背包：\n`,
     `金币：${stockCoin.toFixed(2)} 枚`,
