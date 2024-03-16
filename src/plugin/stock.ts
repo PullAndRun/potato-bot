@@ -183,7 +183,7 @@ async function bag(_: string, event: GroupMessageEvent) {
       }
       return `-${stock.name}\n 均价：${stock.price.toFixed(
         2
-      )}\n 现价：${price.price.toFixed(2)} \n涨幅：${(
+      )}\n 现价：${price.price.toFixed(2)} \n 涨幅：${(
         ((price.price - stock.price) / stock.price) *
         100
       ).toFixed(2)}%`;
