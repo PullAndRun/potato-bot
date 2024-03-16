@@ -13,8 +13,8 @@ const info = {
   defaultActive: true,
   passive: false,
   comment: [
-    `说明：卖买股票`,
-    `使用“${botConf.trigger}股票”命令了解如何卖买股票。`,
+    `说明：交易股票`,
+    `使用“${botConf.trigger}股票”命令了解如何交易股票。`,
   ],
   plugin: plugin,
 };
@@ -25,19 +25,19 @@ async function plugin(event: GroupMessageEvent) {
   const cmdList = [
     {
       name: "查询",
-      comment: `使用“${botConf.trigger}股票 查询 股票名称“命令查询一种股票的价格。`,
+      comment: `使用“${botConf.trigger}股票 查询 股票代码或名称“命令查询一种股票的价格信息。`,
       auth: false,
       plugin: search,
     },
     {
       name: "买",
-      comment: `使用“${botConf.trigger}股票 买 股票名称或代码 您剩余资金的百分比（0-100）“命令购买一种股票。`,
+      comment: `使用“${botConf.trigger}股票 买 股票代码或名称 您资金余量的百分比（0-100）“命令购买一种股票。`,
       auth: false,
       plugin: buy,
     },
     {
       name: "卖",
-      comment: `使用“${botConf.trigger}股票 卖 股票代码 您剩余股票的百分比（0-100）“命令出售一种股票。`,
+      comment: `使用“${botConf.trigger}股票 卖 股票代码 对应股票余量的百分比（0-100）“命令出售一种股票。`,
       auth: false,
       plugin: sell,
     },
@@ -50,7 +50,7 @@ async function plugin(event: GroupMessageEvent) {
     {
       name: "还原",
       auth: false,
-      comment: `使用“${botConf.trigger}股票 还原“命令清空您拥有的所有股票并重置资产为1000元。`,
+      comment: `使用“${botConf.trigger}股票 还原“命令清空您拥有的所有股票并重置资产为1000金币。`,
       plugin: restore,
     },
     {
@@ -69,12 +69,12 @@ async function search(message: string, event: GroupMessageEvent) {
   const stock = await find(msg);
   if (stock === undefined) {
     await replyGroupMsg(event, [
-      `未查询到股票 ${msg} 的信息。请检查股票名或稍后重试。`,
+      `未查询到股票 ${msg} 的信息。请检查股票代码或名称，或者稍后重试。`,
     ]);
     return;
   }
   await replyGroupMsg(event, [
-    `股票： ${msg} \n代码：${stock.code} \n价格：${stock.price}`,
+    `股票名称： ${msg} \n代码：${stock.code} \n价格：${stock.price}`,
   ]);
 }
 
@@ -90,8 +90,15 @@ async function buy(message: string, event: GroupMessageEvent) {
     per > 100
   ) {
     await replyGroupMsg(event, [
-      `命令错误！请使用“${botConf.trigger}股票 买 股票名或代码 您剩余资金的百分比(0-100)”命令购买一种股票。\n`,
-      `注意“股票名”和“剩余资金百分比”需要用空格分隔。`,
+      `命令错误！请使用“${botConf.trigger}股票 买 股票代码或名称 您资金余量的百分比（0-100）“命令购买一种股票。\n`,
+      `注意“股票代码或名称”和“您资金余量的百分比”之间需要用空格分隔。`,
+    ]);
+    return;
+  }
+  const stock = await find(stockName);
+  if (stock === undefined) {
+    await replyGroupMsg(event, [
+      `未查询到名为”${stockName}“的股票，请检查“股票代码或名称“是否正确。\n如“股票代码或名称“正确，请稍后重试。`,
     ]);
     return;
   }
@@ -99,27 +106,22 @@ async function buy(message: string, event: GroupMessageEvent) {
     event.sender.user_id,
     event.group_id
   );
-  const findUser = await userModel.findOrAddOne(
-    event.sender.user_id,
-    event.group_id
-  );
-  const stock = await find(stockName);
-  if (stock === undefined) {
-    await replyGroupMsg(event, [
-      `未查询到名为”${stockName}“的股票，请检查股票名或股票代码是否正确。\n也可能是网络卡顿，如股票名正确，请稍后重试。`,
-    ]);
-    return;
-  }
   const hasStock = findStock.stock.filter(
     (stocks) => stocks.code === stock.code
   );
   if (findStock.stock.length === 5 && hasStock.length === 0) {
-    await replyGroupMsg(event, [`您最多购买5种股票，您已经购买了5种股票`]);
+    await replyGroupMsg(event, [
+      `您最多购买5种股票，您已经购买了5种股票，您不能购买更多种类的股票。`,
+    ]);
     return;
   }
+  const findUser = await userModel.findOrAddOne(
+    event.sender.user_id,
+    event.group_id
+  );
   const buyNum = Math.floor((findUser.stockCoin * (per / 100)) / stock.price);
   if (buyNum === 0) {
-    await replyGroupMsg(event, [`您的钱不够，连一股也买不了`]);
+    await replyGroupMsg(event, [`您的金币不够，连一股也买不了`]);
     return;
   }
   findUser.stockCoin = findUser.stockCoin - buyNum * stock.price;
@@ -133,7 +135,7 @@ async function buy(message: string, event: GroupMessageEvent) {
     stock.price
   );
   await replyGroupMsg(event, [
-    `您使用 ${(buyNum * stock.price).toFixed(2)} 金币购买了 ${buyNum} 股“${
+    `您使用 ${(buyNum * stock.price).toFixed(2)} 枚金币购买了 ${buyNum} 股“${
       stock.name
     }“股票。`,
   ]);
@@ -151,15 +153,15 @@ async function sell(message: string, event: GroupMessageEvent) {
     per > 100
   ) {
     await replyGroupMsg(event, [
-      `命令错误！请使用“${botConf.trigger}股票 卖 股票代码 您剩余股票的百分比(0-100)”命令出售一种股票。\n`,
-      `注意“股票代码”和“剩余股票数量”需要用空格分隔。`,
+      `命令错误！请使用“${botConf.trigger}股票 卖 股票代码 对应股票余量的百分比（0-100）“命令出售一种股票。\n`,
+      `注意“股票代码或名称”和“对应股票余量的百分比”之间需要用空格分隔。`,
     ]);
     return;
   }
   const stock = await find(code);
   if (stock === undefined) {
     await replyGroupMsg(event, [
-      `未查询到代码为”${code}“的股票，请到背包检查股票代码。\n也可能是网络卡顿，如股票名正确，请稍后重试。`,
+      `未查询到代码为”${code}“的股票\n请使用“${botConf.trigger}股票 背包”命令在背包内检查“股票代码“是否正确。\n如“股票代码“正确，请稍后重试。`,
     ]);
     return;
   }
@@ -170,7 +172,7 @@ async function sell(message: string, event: GroupMessageEvent) {
   );
   if (findStock === undefined) {
     await replyGroupMsg(event, [
-      `您没有代码为“${code}“的股票。请到背包检查股票代码。`,
+      `您没有代码为“${code}“的股票。\n请使用“${botConf.trigger}股票 背包”命令在背包内检查“股票代码“是否正确。`,
     ]);
     return;
   }
@@ -221,7 +223,7 @@ async function bag(_: string, event: GroupMessageEvent) {
         stock.number
       }\n 均价：${stock.price.toFixed(2)}\n 现价：${price.price.toFixed(
         2
-      )} \n 涨幅：${(((price.price - stock.price) / stock.price) * 100).toFixed(
+      )}\n 涨幅：${(((price.price - stock.price) / stock.price) * 100).toFixed(
         2
       )}%`;
     })
@@ -256,7 +258,7 @@ async function restore(_: string, event: GroupMessageEvent) {
 async function rank(_: string, event: GroupMessageEvent) {
   const rank = await userModel.stockRank(event.group_id);
   if (rank.length === 0) {
-    await replyGroupMsg(event, [`本群没人炒股`]);
+    await replyGroupMsg(event, [`本群暂时没人炒股`]);
     return;
   }
   const rankList = await Promise.all(
