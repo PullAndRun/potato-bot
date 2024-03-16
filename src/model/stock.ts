@@ -18,7 +18,7 @@ class Stock extends BaseEntity {
   @Column({ type: "float", comment: "群号" })
   gid: number;
 
-  @Column({ type: "json", array: true, comment: "股票", default: [] })
+  @Column({ type: "json", comment: "股票", default: [] })
   stock: Array<{
     name: string;
     number: number;
