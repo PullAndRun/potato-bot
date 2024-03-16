@@ -46,6 +46,18 @@ async function updateStock(
   stockPrice: number = 0
 ) {
   const userStock = await findOrAddOne(uin, gid);
+  const existStock = userStock.stock.filter(
+    (stock) => stock.name === stockName
+  );
+  if (existStock.length === 0 && stockNumber > 0) {
+    userStock.stock.push({
+      name: stockName,
+      number: stockNumber,
+      price: stockPrice,
+    });
+    await userStock.save().catch((_) => undefined);
+    return userStock;
+  }
   for (const [index, stock] of userStock.stock.entries()) {
     //过滤非法数据
     if (
