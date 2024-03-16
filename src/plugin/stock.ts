@@ -114,14 +114,14 @@ async function buy(message: string, event: GroupMessageEvent) {
   await stockModel.updateStock(
     event.sender.user_id,
     event.group_id,
-    stockName,
+    stock.name,
     buyNum,
     stock.price
   );
   await replyGroupMsg(event, [
-    `您使用 ${(buyNum * stock.price).toFixed(
-      2
-    )} 金币购买了 ${buyNum} 股“${stockName}“股票。`,
+    `您使用 ${(buyNum * stock.price).toFixed(2)} 金币购买了 ${buyNum} 股“${
+      stock.name
+    }“股票。`,
   ]);
 }
 
@@ -142,20 +142,20 @@ async function sell(message: string, event: GroupMessageEvent) {
     ]);
     return;
   }
-  const findStock = await stockModel.findOneByStockName(
-    event.sender.user_id,
-    event.group_id,
-    stockName
-  );
-  if (findStock === undefined) {
-    await replyGroupMsg(event, [`您没有名为“${stockName}“的股票。`]);
-    return;
-  }
   const stock = await find(stockName);
   if (stock === undefined) {
     await replyGroupMsg(event, [
       `未查询到名为”${stockName}“的股票，请检查股票名。\n也可能是网络卡顿，如股票名正确，请稍后重试。`,
     ]);
+    return;
+  }
+  const findStock = await stockModel.findOneByStockName(
+    event.sender.user_id,
+    event.group_id,
+    stock.name
+  );
+  if (findStock === undefined) {
+    await replyGroupMsg(event, [`您没有名为“${stock.name}“的股票。`]);
     return;
   }
   const saleNum = Math.floor(findStock.number * (per / 100));
@@ -172,11 +172,11 @@ async function sell(message: string, event: GroupMessageEvent) {
   await stockModel.updateStock(
     event.sender.user_id,
     event.group_id,
-    stockName,
+    stock.name,
     saleNum * -1
   );
   await replyGroupMsg(event, [
-    `您出售了 ${saleNum} 股 ${stockName} 股票\n`,
+    `您出售了 ${saleNum} 股 ${stock.name} 股票\n`,
     `收入 ${(saleNum * stock.price).toFixed(2)}金币\n`,
     `${stock.price >= findStock.price ? "净赚" : "净亏"} ${(
       Math.abs(stock.price - findStock.price) * saleNum
