@@ -93,6 +93,10 @@ async function buy(message: string, event: GroupMessageEvent) {
     ]);
     return;
   }
+  const findStock = await stockModel.findOrAddOne(
+    event.sender.user_id,
+    event.group_id
+  );
   const findUser = await userModel.findOrAddOne(
     event.sender.user_id,
     event.group_id
@@ -102,6 +106,11 @@ async function buy(message: string, event: GroupMessageEvent) {
     await replyGroupMsg(event, [
       `未查询到名为”${stockName}“的股票，请检查股票名。\n也可能是网络卡顿，如股票名正确，请稍后重试。`,
     ]);
+    return;
+  }
+  const hasStock = findStock.stock.filter((stock) => stock.name === stockName);
+  if (findStock.stock.length === 5 && hasStock.length === 0) {
+    await replyGroupMsg(event, [`您最多购买5种股票，您已经购买了5种股票`]);
     return;
   }
   const buyNum = Math.floor((findUser.stockCoin * (per / 100)) / stock.price);
