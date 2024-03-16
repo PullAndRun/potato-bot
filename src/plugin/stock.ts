@@ -81,7 +81,7 @@ async function buy(message: string, event: GroupMessageEvent) {
   const stock = await find(stockName);
   if (stock === undefined) {
     await replyGroupMsg(event, [
-      `未查询到名为”${stockName}“的股票，请检查股票名。\n股票名请自行到各大证券平台查询。`,
+      `未查询到名为”${stockName}“的股票，请检查股票名。\n也可能是网络卡顿，如股票名正确，请稍后重试。`,
     ]);
     return;
   }
@@ -135,7 +135,7 @@ async function sell(message: string, event: GroupMessageEvent) {
   const stock = await find(stockName);
   if (stock === undefined) {
     await replyGroupMsg(event, [
-      `未查询到名为”${stockName}“的股票，请检查股票名。股票名请自行到各大证券平台查询。`,
+      `未查询到名为”${stockName}“的股票，请检查股票名。\n也可能是网络卡顿，如股票名正确，请稍后重试。`,
     ]);
     return;
   }
@@ -154,12 +154,12 @@ async function sell(message: string, event: GroupMessageEvent) {
     event.sender.user_id,
     event.group_id,
     stockName,
-    -saleNum
+    saleNum * -1
   );
   await replyGroupMsg(event, [
-    `您出售了 ${saleNum} 股 ${stockName} 股票，收入 ${(
-      saleNum * stock.price
-    ).toFixed(2)}金币，${stock.price >= findStock.price ? "净赚" : "净亏"} ${(
+    `您出售了 ${saleNum} 股 ${stockName} 股票\n`,
+    `收入 ${(saleNum * stock.price).toFixed(2)}金币\n`,
+    `${stock.price >= findStock.price ? "净赚" : "净亏"} ${(
       Math.abs(stock.price - findStock.price) * saleNum
     ).toFixed(2)} 金币`,
   ]);
@@ -179,14 +179,15 @@ async function bag(_: string, event: GroupMessageEvent) {
     findStock.stock.map(async (stock) => {
       const price = await find(stock.name);
       if (price === undefined) {
-        return `-${stock.name}\n 均价：${stock.price}\n 现价：获取失败`;
+        return `-${stock.name}\n 数量：${stock.number}\n 均价：${stock.price}\n 现价：获取失败`;
       }
-      return `-${stock.name}\n 均价：${stock.price.toFixed(
+      return `-${stock.name}\n 数量：${
+        stock.number
+      }\n 均价：${stock.price.toFixed(2)}\n 现价：${price.price.toFixed(
         2
-      )}\n 现价：${price.price.toFixed(2)} \n 涨幅：${(
-        ((price.price - stock.price) / stock.price) *
-        100
-      ).toFixed(2)}%`;
+      )} \n 涨幅：${(((price.price - stock.price) / stock.price) * 100).toFixed(
+        2
+      )}%`;
     })
   );
   await replyGroupMsg(event, [
