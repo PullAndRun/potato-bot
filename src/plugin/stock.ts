@@ -85,7 +85,7 @@ async function buy(message: string, event: GroupMessageEvent) {
     ]);
     return;
   }
-  const buyNum = (findUser.stockCoin * (per / 100)) % stock.price;
+  const buyNum = Math.floor((findUser.stockCoin * (per / 100)) / stock.price);
   if (buyNum === 0) {
     await replyGroupMsg(event, [`您的钱不够，连一股也买不了`]);
     return;
@@ -100,9 +100,9 @@ async function buy(message: string, event: GroupMessageEvent) {
     stock.price
   );
   await replyGroupMsg(event, [
-    `您使用 ${
-      buyNum * stock.price
-    } 金币购买了 ${buyNum} 股“${stockName}“股票。`,
+    `您使用 ${(buyNum * stock.price).toFixed(
+      2
+    )} 金币购买了 ${buyNum} 股“${stockName}“股票。`,
   ]);
 }
 
@@ -157,11 +157,11 @@ async function sell(message: string, event: GroupMessageEvent) {
     -saleNum
   );
   await replyGroupMsg(event, [
-    `您出售了 ${saleNum} 股 ${stockName} 股票，收入 ${
+    `您出售了 ${saleNum} 股 ${stockName} 股票，收入 ${(
       saleNum * stock.price
-    }金币，${stock.price >= findStock.price ? "净赚" : "净亏"} ${
+    ).toFixed(2)}金币，${stock.price >= findStock.price ? "净赚" : "净亏"} ${(
       Math.abs(stock.price - findStock.price) * saleNum
-    } 金币`,
+    ).toFixed(2)} 金币`,
   ]);
 }
 
@@ -180,15 +180,16 @@ async function bag(_: string, event: GroupMessageEvent) {
     if (price === undefined) {
       return `-${stock.name}\n 均价：${stock.price}\n 现价：获取失败`;
     }
-    return `-${stock.name}\n 均价：${stock.price}\n 现价：${
-      price.price
-    } \n涨幅：${(((price.price - stock.price) / stock.price) * 100).toFixed(
+    return `-${stock.name}\n 均价：${stock.price.toFixed(
       2
-    )}%`;
+    )}\n 现价：${price.price.toFixed(2)} \n涨幅：${(
+      ((price.price - stock.price) / stock.price) *
+      100
+    ).toFixed(2)}%`;
   });
   await replyGroupMsg(event, [
     `您的背包：\n`,
-    `金币：${stockCoin} 枚`,
+    `金币：${stockCoin.toFixed(2)} 枚`,
     stock.length ? "\n股票：\n" + stock.join("\n") : "",
   ]);
 }
@@ -227,7 +228,7 @@ async function rank(_: string, event: GroupMessageEvent) {
           event.group_id,
           user.uin
         );
-        return `${member.nickname} 拥有 ${user.stockCoin} 金币`;
+        return `${member.nickname} 拥有 ${user.stockCoin.toFixed(2)} 金币`;
       })
       .filter((_, i) => i < 10)
       .join("\n"),
