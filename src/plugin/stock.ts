@@ -24,6 +24,12 @@ async function plugin(event: GroupMessageEvent) {
   const msg = msgNoCmd(event.raw_message, [botConf.trigger, info.name]);
   const cmdList = [
     {
+      name: "查询",
+      comment: `使用“${botConf.trigger}股票 查询 股票名称“命令查询一种股票的价格。`,
+      auth: false,
+      plugin: search,
+    },
+    {
       name: "买",
       comment: `使用“${botConf.trigger}股票 买 股票名称 您剩余资金的百分比（0-100）“命令购买一种股票。`,
       auth: false,
@@ -55,6 +61,19 @@ async function plugin(event: GroupMessageEvent) {
     },
   ];
   await secondCmd(`${botConf.trigger}股票`, msg, cmdList, event);
+}
+
+//bot 股票 查询
+async function search(message: string, event: GroupMessageEvent) {
+  const msg = msgNoCmd(message, ["查询"]);
+  const stock = await find(msg);
+  if (stock === undefined) {
+    await replyGroupMsg(event, [
+      `未查询到股票 ${msg} 的信息。请检查股票名或稍后重试。`,
+    ]);
+    return;
+  }
+  await replyGroupMsg(event, [`股票 ${msg} 的价格：${stock.price}`]);
 }
 
 //bot股票 买
