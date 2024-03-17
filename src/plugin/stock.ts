@@ -74,7 +74,7 @@ async function search(message: string, event: GroupMessageEvent) {
     return;
   }
   await replyGroupMsg(event, [
-    `股票名称： ${msg} \n代码：${stock.code} \n价格：${stock.price}`,
+    `股票名称：${msg} \n代码：${stock.code} \n价格：${stock.price}`,
   ]);
 }
 
