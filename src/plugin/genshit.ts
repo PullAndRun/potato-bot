@@ -42,4 +42,4 @@ async function genshit() {
   return readFile.toString("base64");
 }
 
-genshit();
+export { info };
