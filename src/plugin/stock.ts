@@ -195,8 +195,8 @@ async function sell(message: string, event: GroupMessageEvent) {
     saleNum * -1
   );
   await replyGroupMsg(event, [
-    `您以每股 ${stock.price} 金币的价格出售了 ${saleNum} 股 ${stock.name} 股票\n`,
-    `收入 ${(saleNum * stock.price).toFixed(2)}金币\n`,
+    `您以每股 ${stock.price} 枚金币的价格出售了 ${saleNum} 股 ${stock.name} 股票\n`,
+    `收入 ${(saleNum * stock.price).toFixed(2)} 金币\n`,
     `${stock.price >= findStock.price ? "净赚" : "净亏"} ${(
       Math.abs(stock.price - findStock.price) * saleNum
     ).toFixed(2)} 金币`,
