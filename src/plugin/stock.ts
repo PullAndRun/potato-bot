@@ -135,9 +135,9 @@ async function buy(message: string, event: GroupMessageEvent) {
     stock.price
   );
   await replyGroupMsg(event, [
-    `您使用 ${(buyNum * stock.price).toFixed(2)} 枚金币购买了 ${buyNum} 股“${
-      stock.name
-    }“股票。`,
+    `您使用 ${(buyNum * stock.price).toFixed(2)} 枚金币以每股 ${
+      stock.price
+    } 金币的价格购买了 ${buyNum} 股“${stock.name}“股票。`,
   ]);
 }
 
@@ -195,7 +195,7 @@ async function sell(message: string, event: GroupMessageEvent) {
     saleNum * -1
   );
   await replyGroupMsg(event, [
-    `您出售了 ${saleNum} 股 ${stock.name} 股票\n`,
+    `您以每股 ${stock.price} 金币的价格出售了 ${saleNum} 股 ${stock.name} 股票\n`,
     `收入 ${(saleNum * stock.price).toFixed(2)}金币\n`,
     `${stock.price >= findStock.price ? "净赚" : "净亏"} ${(
       Math.abs(stock.price - findStock.price) * saleNum
@@ -272,14 +272,20 @@ async function rank(_: string, event: GroupMessageEvent) {
       stock.stock.forEach((sto) => {
         coin += sto.number * sto.price;
       });
-      coin += user.stockCoin;
-      return `${member.nickname} 拥有 ${coin.toFixed(2)} 金币`;
+      return {
+        user: member.nickname,
+        coin: coin,
+      };
     })
-  );
-  await replyGroupMsg(event, [
-    `财富榜前10名玩家：\n`,
-    rankList.filter((_, i) => i < 10).join("\n"),
-  ]);
+  ).catch((_) => undefined);
+  if (rankList === undefined) {
+    return;
+  }
+  const sortList = rankList
+    .sort((a, b) => b.coin - a.coin)
+    .filter((_, i) => i < 10)
+    .map((list) => `${list.user} 拥有 ${list.coin.toFixed(2)} 金币`);
+  await replyGroupMsg(event, [`财富榜前10名玩家：\n`, sortList.join("\n")]);
 }
 
 async function find(name: string) {
