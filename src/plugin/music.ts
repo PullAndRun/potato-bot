@@ -7,13 +7,13 @@ import { fetchBuffer } from "../util/http";
 import musicConf from "@potato/config/music.json";
 
 const info = {
-  name: "点歌",
+  name: "听",
   type: "plugin",
   defaultActive: true,
   passive: false,
   comment: [
     `说明：点一首网易云音乐的歌`,
-    `使用“${botConf.trigger}点歌 歌曲名或歌曲id”点歌`,
+    `使用“${botConf.trigger}听 歌曲名或歌曲id”点歌`,
     `如果不输入歌曲名，就随机点一首歌`,
   ],
   plugin: plugin,

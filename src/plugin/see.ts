@@ -4,6 +4,7 @@ import { createFetch, fetchBuffer } from "../util/http";
 import seeConf from "@potato/config/see.json";
 import { z } from "zod";
 import { msgNoCmd, replyGroupMsg } from "../util/bot";
+import { parseJson } from "../util/util";
 
 const info = {
   name: "看",
@@ -45,7 +46,13 @@ async function search(text: string) {
       }),
     5000
   )
-    .then((resp) => resp?.json())
+    .then(async (resp) => {
+      const text = await resp?.text();
+      if (text === undefined) {
+        return undefined;
+      }
+      return parseJson(text.replaceAll(/\u0001/g, ""));
+    })
     .catch((_) => undefined);
   const imageInfoSchema = z.object({
     data: z.array(z.object({ thumbURL: z.string().nullish() })).min(1),
