@@ -274,7 +274,7 @@ async function rank(_: string, event: GroupMessageEvent) {
       });
       return {
         user: member.nickname,
-        coin: coin,
+        coin: coin + user.stockCoin,
       };
     })
   ).catch((_) => undefined);
