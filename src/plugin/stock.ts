@@ -83,13 +83,13 @@ async function search(message: string, event: GroupMessageEvent) {
     `周转率：${stock.turnoverRatio}\n`,
     `市盈率：${stock.peRate}\n`,
     `市净率：${stock.pbRate}\n`,
-    `价格：${stock.price}\n`,
     `${Number.parseFloat(stock.ratio) >= 0 ? "涨幅" : "跌幅"}：${
       stock.ratio
     }\n`,
     `${Number.parseFloat(stock.increase) >= 0 ? "涨" : "跌"}：${
       stock.increase
-    }`,
+    } 金币\n`,
+    `价格：${stock.price} 金币`,
   ]);
 }
 
