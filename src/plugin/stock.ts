@@ -118,6 +118,7 @@ async function buy(message: string, event: GroupMessageEvent) {
     ]);
     return;
   }
+
   const stock = await find(stockName);
   if (stock === undefined) {
     await replyGroupMsg(event, [
@@ -355,35 +356,31 @@ async function find(name: string) {
   if (!safeStock.success || !safeStock.data.Result.stock[0]) {
     return undefined;
   }
-
   const stockResult = safeStock.data.Result.stock[0];
-  let stockStatusInfoChs = stockResult.stockStatusInfo;
-  switch (stockResult.stockStatusInfo) {
-    case "ADD":
-      stockStatusInfoChs = "产品未上市";
-      break;
-    case "START":
-      stockStatusInfoChs = "启动";
-      break;
-    case "OCALL":
-      stockStatusInfoChs = "开市集合竞价";
-      break;
-    case "TRADE":
-      stockStatusInfoChs = "连续自动撮合";
-      break;
-    case "SUSP":
-      stockStatusInfoChs = "停牌";
-      break;
-    case "CLOSE":
-      stockStatusInfoChs = "闭市";
-      break;
-    case "ENDTR":
-      stockStatusInfoChs = "交易结束";
-  }
+  const stockStatusInfoChs = (info: string) => {
+    switch (info) {
+      case "ADD":
+        return "产品未上市";
+      case "START":
+        return "启动";
+      case "OCALL":
+        return "开市集合竞价";
+      case "TRADE":
+        return "连续自动撮合";
+      case "SUSP":
+        return "停牌";
+      case "CLOSE":
+        return "闭市";
+      case "ENDTR":
+        return "交易结束";
+      default:
+        return info;
+    }
+  };
   return {
     ...stockResult,
     price: Number.parseFloat(stockResult.price),
-    stockStatusInfoChs: stockStatusInfoChs,
+    stockStatusInfoChs: stockStatusInfoChs(stockResult.stockStatusInfo),
   };
 }
 
