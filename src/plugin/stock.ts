@@ -239,7 +239,7 @@ async function bag(_: string, event: GroupMessageEvent) {
   );
   const stock = await Promise.all(
     findStock.stock.map(async (stock) => {
-      const price = await find(stock.name);
+      const price = await find(stock.code);
       if (price === undefined) {
         return `-${stock.name}\n 代码：${stock.code}\n 数量：${stock.number}\n 均价：${stock.price}\n 现价：获取失败`;
       }
