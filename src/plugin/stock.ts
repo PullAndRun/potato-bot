@@ -1,11 +1,13 @@
 import { GroupMessageEvent } from "@icqqjs/icqq";
 import * as stockModel from "@potato/bot/model/stock.ts";
 import * as userModel from "@potato/bot/model/user.ts";
+import * as aiModel from "@potato/bot/model/ai.ts";
 import botConf from "@potato/config/bot.json";
 import stockConf from "@potato/config/stock.json";
 import { z } from "zod";
 import { getMasterBot, msgNoCmd, replyGroupMsg, secondCmd } from "../util/bot";
 import { createFetch } from "../util/http";
+import { createChat } from "./chat";
 
 const info = {
   name: "股票",
@@ -73,7 +75,7 @@ async function search(message: string, event: GroupMessageEvent) {
     ]);
     return;
   }
-  await replyGroupMsg(event, [
+  const stockResult = [
     `股票名称：${msg}\n`,
     `代码：${stock.code}\n`,
     `状态：${stock.stockStatusInfo}\n`,
@@ -90,7 +92,13 @@ async function search(message: string, event: GroupMessageEvent) {
       stock.increase
     } 金币\n`,
     `价格：${stock.price} 金币`,
-  ]);
+  ];
+  const ai = await aiModel.findOne("金融分析师");
+  if (ai !== null) {
+    const aiResult = await createChat(stockResult.join(""), ai.prompt);
+    stockResult.push(`\n————\nAI分析：${aiResult}`);
+  }
+  await replyGroupMsg(event, stockResult);
 }
 
 //bot股票 买
