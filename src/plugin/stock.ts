@@ -78,7 +78,7 @@ async function search(message: string, event: GroupMessageEvent) {
   const stockResult = [
     `股票名称：${msg}\n`,
     `代码：${stock.code}\n`,
-    `状态：${stock.stockStatusInfo}\n`,
+    `状态：${stock.stockStatusInfoChs}(${stock.stockStatusInfo})\n`,
     `市值：${stock.capitalization}\n`,
     `成交量：${stock.amount}\n`,
     `振幅：${stock.amplitudeRatio}\n`,
@@ -357,33 +357,33 @@ async function find(name: string) {
   }
 
   const stockResult = safeStock.data.Result.stock[0];
-  let stockStatusInfo = stockResult.stockStatusInfo;
+  let stockStatusInfoChs = stockResult.stockStatusInfo;
   switch (stockResult.stockStatusInfo) {
     case "ADD":
-      stockStatusInfo = "产品未上市";
+      stockStatusInfoChs = "产品未上市";
       break;
     case "START":
-      stockStatusInfo = "启动";
+      stockStatusInfoChs = "启动";
       break;
     case "OCALL":
-      stockStatusInfo = "开市集合竞价";
+      stockStatusInfoChs = "开市集合竞价";
       break;
     case "TRADE":
-      stockStatusInfo = "连续自动撮合";
+      stockStatusInfoChs = "连续自动撮合";
       break;
     case "SUSP":
-      stockStatusInfo = "停牌";
+      stockStatusInfoChs = "停牌";
       break;
     case "CLOSE":
-      stockStatusInfo = "闭市";
+      stockStatusInfoChs = "闭市";
       break;
     case "ENDTR":
-      stockStatusInfo = "交易结束";
+      stockStatusInfoChs = "交易结束";
   }
   return {
     ...stockResult,
     price: Number.parseFloat(stockResult.price),
-    stockStatusInfo: stockStatusInfo,
+    stockStatusInfoChs: stockStatusInfoChs,
   };
 }
 
