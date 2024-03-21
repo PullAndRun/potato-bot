@@ -74,7 +74,22 @@ async function search(message: string, event: GroupMessageEvent) {
     return;
   }
   await replyGroupMsg(event, [
-    `股票名称：${msg} \n代码：${stock.code} \n价格：${stock.price}`,
+    `股票名称：${msg}\n`,
+    `代码：${stock.code}\n`,
+    `状态：${stock.stockStatusInfo}\n`,
+    `市值：${stock.capitalization}\n`,
+    `成交量：${stock.amount}\n`,
+    `振幅：${stock.amplitudeRatio}\n`,
+    `周转率：${stock.turnoverRatio}\n`,
+    `市盈率：${stock.peRate}\n`,
+    `市净率：${stock.pbRate}\n`,
+    `价格：${stock.price}\n`,
+    `${Number.parseFloat(stock.ratio) >= 0 ? "涨幅" : "跌幅"}：${
+      stock.ratio
+    }\n`,
+    `${Number.parseFloat(stock.increase) >= 0 ? "涨" : "跌"}：${
+      stock.increase
+    }`,
   ]);
 }
 
@@ -299,9 +314,30 @@ async function find(name: string) {
       stock: z
         .array(
           z.object({
+            //股票名
             name: z.string(),
+            //价格
             price: z.string(),
+            //代码
             code: z.string(),
+            //价格变化
+            increase: z.string(),
+            //价格变化率
+            ratio: z.string(),
+            //振幅
+            amplitudeRatio: z.string(),
+            //周转率
+            turnoverRatio: z.string(),
+            //市盈率
+            peRate: z.string(),
+            //市净率
+            pbRate: z.string(),
+            //状态
+            stockStatusInfo: z.string(),
+            //成交量
+            amount: z.string(),
+            //市值
+            capitalization: z.string(),
           })
         )
         .min(1),
@@ -311,10 +347,10 @@ async function find(name: string) {
   if (!safeStock.success || !safeStock.data.Result.stock[0]) {
     return undefined;
   }
+  const stockResult = safeStock.data.Result.stock[0];
   return {
-    name: safeStock.data.Result.stock[0].name,
-    code: safeStock.data.Result.stock[0].code,
-    price: Number.parseFloat(safeStock.data.Result.stock[0].price),
+    ...stockResult,
+    price: Number.parseFloat(stockResult.price),
   };
 }
 
