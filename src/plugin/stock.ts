@@ -79,7 +79,7 @@ async function search(message: string, event: GroupMessageEvent) {
     `股票名称：${msg}\n`,
     `代码：${stock.code}\n`,
     `状态：${stock.stockStatusInfoChs}(${stock.stockStatusInfo})\n`,
-    `市值：${stock.capitalization}\n`,
+    `市值：${stock.capitalization}¥\n`,
     `成交量：${stock.amount}\n`,
     `振幅：${stock.amplitudeRatio}\n`,
     `周转率：${stock.turnoverRatio}\n`,
@@ -90,8 +90,8 @@ async function search(message: string, event: GroupMessageEvent) {
     }\n`,
     `${Number.parseFloat(stock.increase) >= 0 ? "涨" : "跌"}：${
       stock.increase
-    } 金币\n`,
-    `价格：${stock.price} 金币`,
+    }¥\n`,
+    `价格：${stock.price}¥`,
   ];
   const ai = await aiModel.findOne("金融分析师");
   if (ai !== null) {
