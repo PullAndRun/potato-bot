@@ -355,10 +355,35 @@ async function find(name: string) {
   if (!safeStock.success || !safeStock.data.Result.stock[0]) {
     return undefined;
   }
+
   const stockResult = safeStock.data.Result.stock[0];
+  let stockStatusInfo = stockResult.stockStatusInfo;
+  switch (stockResult.stockStatusInfo) {
+    case "ADD":
+      stockStatusInfo = "产品未上市";
+      break;
+    case "START":
+      stockStatusInfo = "启动";
+      break;
+    case "OCALL":
+      stockStatusInfo = "开市集合竞价";
+      break;
+    case "TRADE":
+      stockStatusInfo = "连续自动撮合";
+      break;
+    case "SUSP":
+      stockStatusInfo = "停牌";
+      break;
+    case "CLOSE":
+      stockStatusInfo = "闭市";
+      break;
+    case "ENDTR":
+      stockStatusInfo = "交易结束";
+  }
   return {
     ...stockResult,
     price: Number.parseFloat(stockResult.price),
+    stockStatusInfo: stockStatusInfo,
   };
 }
 
