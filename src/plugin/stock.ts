@@ -118,7 +118,6 @@ async function buy(message: string, event: GroupMessageEvent) {
     ]);
     return;
   }
-
   const stock = await find(stockName);
   if (stock === undefined) {
     await replyGroupMsg(event, [
