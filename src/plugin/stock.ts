@@ -244,12 +244,13 @@ async function bag(_: string, event: GroupMessageEvent) {
       }
       return `-${stock.name}\n 代码：${stock.code}\n 数量：${
         stock.number
-      }\n 市值：${price.capitalization}\n 均价：${stock.price.toFixed(
+      }\n 总价：${(price.price * stock.number).toFixed(
         2
-      )}\n 现价：${price.price.toFixed(2)}\n 涨幅：${(
-        ((price.price - stock.price) / stock.price) *
-        100
-      ).toFixed(2)}%`;
+      )}\n 均价：${stock.price.toFixed(2)}\n 现价：${price.price.toFixed(
+        2
+      )}\n 涨幅：${(((price.price - stock.price) / stock.price) * 100).toFixed(
+        2
+      )}%`;
     })
   );
   await replyGroupMsg(event, [
