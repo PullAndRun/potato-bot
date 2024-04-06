@@ -27,7 +27,7 @@ async function plugin(event: GroupMessageEvent) {
     return;
   }
   const ids = Number.parseInt(msg);
-  if (isNaN(ids)) {
+  if (isNaN(ids) || msg.length !== ids.toString().length) {
     const kids = await keywordToIds(msg);
     await sendMusicMsg(event, kids);
     return;
