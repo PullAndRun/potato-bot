@@ -32,7 +32,10 @@ async function plugin(event: GroupMessageEvent) {
     return;
   }
   await replyGroupMsg(event, [
-    segment.image(`base64://${image.toString("base64")}`),
+    `标题：${image.title || "无"}\n`,
+    `作者：${image.author || "无"}\n`,
+    `描述：${image.tags.join(" ") || "无"}\n`,
+    `链接：${image.urls}`,
   ]);
 }
 
@@ -52,18 +55,21 @@ async function search(tag: string[]) {
     .catch((_) => undefined);
   const imageInfoSchema = z.object({
     data: z
-      .array(z.object({ urls: z.object({ original: z.string() }) }))
+      .array(
+        z.object({
+          title: z.string().nullish(),
+          author: z.string().nullish(),
+          tags: z.array(z.string()),
+          urls: z.object({ original: z.string() }),
+        })
+      )
       .min(1),
   });
   const safeImageInfo = imageInfoSchema.safeParse(fetchImageInfo);
   if (!safeImageInfo.success) {
     return undefined;
   }
-  const data = safeImageInfo.data.data[0];
-  if (data === undefined) {
-    return undefined;
-  }
-  return fetchBuffer(data.urls.original);
+  return safeImageInfo.data.data[0];
 }
 
 export { info };
