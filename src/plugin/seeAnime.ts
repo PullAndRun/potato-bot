@@ -35,7 +35,7 @@ async function plugin(event: GroupMessageEvent) {
     `标题：${image.title || "无"}\n`,
     `作者：${image.author || "无"}\n`,
     `描述：${image.tags.join(" ") || "无"}\n`,
-    `链接：${image.urls}`,
+    `链接：${image.urls.original}`,
   ]);
 }
 
