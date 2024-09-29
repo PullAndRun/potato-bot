@@ -55,7 +55,7 @@ async function loginOneAccount(uin: number, password: string, order: number) {
     data_dir: botConf.data_dir,
     ffmpeg_path: `${ffmpegPath}/ffmpeg`,
     ffprobe_path: `${ffmpegPath}/ffprobe`,
-    log_level: "error",
+    log_level: "info",
   });
   client
     .on("system.login.slider", async (v) => {
