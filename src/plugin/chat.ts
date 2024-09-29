@@ -56,6 +56,9 @@ async function createChat(msg: string, prompt: string | undefined = undefined) {
     gptMessages.unshift({ role: "system", content: catAi.prompt });
     return chat(gptMessages);
   }
+  if (prompt === "openai") {
+    return chat([{ role: "user", content: msg }]);
+  }
   gptMessages.unshift({ role: "system", content: prompt });
   return chat(gptMessages);
 }
