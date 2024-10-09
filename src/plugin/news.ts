@@ -165,17 +165,14 @@ async function fetchRealtimeNews() {
       if (v.title === undefined || v.content.items.length === 0) {
         return undefined;
       }
-      if (v.content.items.length === 1 && v.content.items[0]) {
-        if (v.content.items[0].data === undefined) {
-          return undefined;
-        }
-        return {
-          title: v.title,
-          text: v.content.items[0].data,
-        };
-      }
       const content = v.content.items
-        .map((v, i) => `${i}、${v.data}`)
+        .map((vv) => {
+          if (vv.data === v.title) {
+            return undefined;
+          }
+          return `${vv.data}`;
+        })
+        .filter((v) => v !== undefined)
         .join("\n");
       return {
         title: v.title,
