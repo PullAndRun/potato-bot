@@ -166,13 +166,12 @@ async function fetchRealtimeNews() {
         return undefined;
       }
       const content = v.content.items
-        .map((vv) => {
-          if (vv.data === v.title) {
-            return undefined;
+        .map((vv, i) => {
+          if (vv.data.replace(/。/g, "") === v.title.replace(/。/g, "")) {
+            return `=>快讯内容同标题`;
           }
-          return `${vv.data}`;
+          return `=>${vv.data}`;
         })
-        .filter((v) => v !== undefined)
         .join("\n");
       return {
         title: v.title,
@@ -215,7 +214,10 @@ async function fetchNews() {
       if (!resp.desc || !resp.query) {
         return undefined;
       }
-      return resp;
+      return {
+        desc: "=>" + resp.desc,
+        query: resp.query,
+      };
     })
     .filter(
       (resp): resp is { desc: string; query: string } => resp !== undefined

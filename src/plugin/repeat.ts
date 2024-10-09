@@ -2,6 +2,7 @@ import { GroupMessageEvent } from "@icqqjs/icqq";
 import botConf from "@potato/config/bot.json";
 import repeatConf from "@potato/config/repeat.json";
 import { getBots, sendGroupMsg } from "../util/bot";
+import * as pluginModel from "../model/plugin";
 
 const info = {
   name: "复读",
@@ -29,6 +30,14 @@ async function plugin(event: GroupMessageEvent) {
     repeatConf.count
   );
   if (repeatText === undefined) {
+    return;
+  }
+  const pluginSwitch = await pluginModel.findOrAddOne(
+    event.group_id,
+    "复读",
+    true
+  );
+  if (pluginSwitch.active === false) {
     return;
   }
   for (const client of getBots()) {
