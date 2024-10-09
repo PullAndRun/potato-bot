@@ -18,10 +18,13 @@ const newsMap: Map<number, Array<string>> = new Map();
 
 schedule.scheduleJob(`0 0 0 */1 * *`, () => {
   newsMap.forEach((news, gid) => {
-    if (news.length < 100) {
+    if (news.length < 300) {
       return;
     }
-    newsMap.set(gid, []);
+    newsMap.set(
+      gid,
+      news.filter((_, i, arr) => i > arr.length / 2)
+    );
   });
 });
 
@@ -42,7 +45,29 @@ schedule.scheduleJob(`0 0 */1 * * *`, async () => {
         return;
       }
       await sendGroupMsg(getMasterBot(), group.group_id, [
-        "为您推送新闻：\n\n" + news,
+        "为您推送热点新闻：\n\n" + news,
+      ]);
+    });
+});
+
+schedule.scheduleJob(`0 */2 * * * *`, async () => {
+  getMasterBot()
+    .getGroupList()
+    .forEach(async (group) => {
+      const pluginSwitch = await pluginModel.findOrAddOne(
+        group.group_id,
+        "快讯推送",
+        false
+      );
+      if (pluginSwitch.active === false) {
+        return;
+      }
+      const news = await pushRealtimeNews(group.group_id);
+      if (news === undefined) {
+        return;
+      }
+      await sendGroupMsg(getMasterBot(), group.group_id, [
+        "为您推送实时快讯：\n\n" + news,
       ]);
     });
 });
@@ -56,22 +81,47 @@ async function plugin(event: GroupMessageEvent) {
   await replyGroupMsg(event, ["为您推送新闻：\n\n" + news]);
 }
 
-//获取需要向指定群推送的新闻
 async function pushNews(gid: number) {
   const news = await fetchNews();
   if (news === undefined) {
     return undefined;
   }
+  return duplicate(
+    gid,
+    news.map((v) => {
+      return {
+        text: v.desc,
+        title: v.desc,
+      };
+    })
+  );
+}
+
+async function pushRealtimeNews(gid: number) {
+  const news = await fetchRealtimeNews();
+  if (news === undefined) {
+    return undefined;
+  }
+  return duplicate(gid, news);
+}
+
+async function duplicate(
+  gid: number,
+  news: {
+    text: string;
+    title: string;
+  }[]
+) {
   const realNews = news
     .map((resp) => {
       const existNewsList = newsMap.get(gid);
-      if (existNewsList === undefined || !existNewsList.includes(resp.query)) {
+      if (existNewsList === undefined || !existNewsList.includes(resp.title)) {
         return resp;
       }
       return undefined;
     })
     .filter(
-      (resp): resp is { desc: string; query: string } => resp !== undefined
+      (resp): resp is { text: string; title: string } => resp !== undefined
     )
     .filter((_, index) => index < 5);
   if (realNews.length === 0) {
@@ -79,11 +129,62 @@ async function pushNews(gid: number) {
   }
   realNews.forEach((resp) => {
     const existNewsList = newsMap.get(gid);
-    newsMap.set(gid, (existNewsList || []).concat([resp.query]));
+    newsMap.set(gid, (existNewsList || []).concat([resp.title]));
   });
   return realNews
-    .map((resp, index) => `${index + 1}、${resp.query}\n${resp.desc}`)
+    .map((resp, index) => `${index + 1}、${resp.title}\n${resp.text}`)
     .join("\n\n");
+}
+
+async function fetchRealtimeNews() {
+  const newsJson = await createFetch(newsConf.api.baiduRealTime, 5000)
+    .then((resp) => resp?.json())
+    .catch((_) => undefined);
+  const newsSchema = z.object({
+    Result: z.object({
+      content: z.object({
+        list: z
+          .array(
+            z.object({
+              title: z.string(),
+              content: z.object({
+                items: z.array(z.object({ data: z.string() })).min(1),
+              }),
+            })
+          )
+          .min(1),
+      }),
+    }),
+  });
+  const safeNewsJson = newsSchema.safeParse(newsJson);
+  if (!safeNewsJson.success) {
+    return undefined;
+  }
+  return safeNewsJson.data.Result.content.list
+    .map((v) => {
+      if (v.title === undefined || v.content.items.length === 0) {
+        return undefined;
+      }
+      if (v.content.items.length === 1 && v.content.items[0]) {
+        if (v.content.items[0].data === undefined) {
+          return undefined;
+        }
+        return {
+          title: v.title,
+          text: v.content.items[0].data,
+        };
+      }
+      const content = v.content.items
+        .map((v, i) => `${i}、${v.data}`)
+        .join("\n");
+      return {
+        title: v.title,
+        text: content,
+      };
+    })
+    .filter(
+      (resp): resp is { text: string; title: string } => resp !== undefined
+    );
 }
 
 async function fetchNews() {
