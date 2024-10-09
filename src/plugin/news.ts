@@ -91,7 +91,7 @@ async function pushNews(gid: number) {
     news.map((v) => {
       return {
         text: v.desc,
-        title: v.desc,
+        title: v.query,
       };
     })
   );
