@@ -146,7 +146,7 @@ async function fetchRealtimeNews() {
         list: z
           .array(
             z.object({
-              title: z.string(),
+              title: z.string().nullish(),
               content: z.object({
                 items: z.array(z.object({ data: z.string() })).min(1),
               }),
@@ -162,19 +162,19 @@ async function fetchRealtimeNews() {
   }
   return safeNewsJson.data.Result.content.list
     .map((v) => {
-      if (v.title === undefined || v.content.items.length === 0) {
-        return undefined;
-      }
       const content = v.content.items
-        .map((vv, i) => {
-          if (vv.data.replace(/。/g, "") === v.title.replace(/。/g, "")) {
+        .map((vv) => {
+          if (
+            !(v.title === undefined || v.title === null) &&
+            vv.data.replace(/。/g, "") === v.title.replace(/。/g, "")
+          ) {
             return `=>快讯内容同标题`;
           }
           return `=>${vv.data}`;
         })
         .join("\n");
       return {
-        title: v.title,
+        title: v.title || "本快讯无标题",
         text: content,
       };
     })
