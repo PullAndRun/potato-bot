@@ -224,4 +224,4 @@ async function fetchNews() {
     );
 }
 
-export { info };
+export { info, fetchRealtimeNews };

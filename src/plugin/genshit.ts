@@ -28,7 +28,7 @@ async function plugin(event: GroupMessageEvent) {
 
 async function genshit() {
   const files = await fs.readdir(
-    path.resolve("data/resource/GenshitJokes/genshitjokes"),
+    path.resolve("data/resource/miHoYoJokes/genshitjokes"),
     { withFileTypes: true, recursive: true }
   );
   const jpgFiles = files.filter((file) => file.name.endsWith(".jpg"));
