@@ -107,8 +107,41 @@ async function plugin(event: GroupMessageEvent) {
       auth: false,
       plugin: subList,
     },
+    {
+      name: "查询",
+      comment: `使用“${botConf.trigger}订阅 查询“命令查询up主直播状态`,
+      auth: false,
+      plugin: liveSearch,
+    },
   ];
   await secondCmd(`${botConf.trigger}订阅`, msg, cmdList, event);
+}
+
+async function liveSearch(message: string, event: GroupMessageEvent) {
+  const msg = msgNoCmd(message, ["查询"]);
+  if (msg.length === 0) {
+    await replyGroupMsg(event, [
+      `命令错误。请使用“${botConf.trigger}订阅”获取命令的正确使用方式。`,
+    ]);
+    return;
+  }
+  const user = await findUser(msg);
+  if (user === undefined) {
+    await replyGroupMsg(event, [`没查询到up主"${msg}"`]);
+    return;
+  }
+  const liveState = await findLive(user.room_id);
+  if (liveState === undefined) {
+    await replyGroupMsg(event, [`没查询到直播间"${user.room_id}"的信息`]);
+    return;
+  }
+  await replyGroupMsg(event, [
+    `up主"${user.uname}"的直播信息：\n`,
+    `标题：${liveState.title}\n`,
+    `简介：${liveState.description}\n`,
+    `开播时间：${liveState.pubDate}`,
+    `直播间链接：${liveState.link}`,
+  ]);
 }
 
 //bot订阅 新增
@@ -219,7 +252,7 @@ async function findLive(room_id: number) {
   }
   const roomInfo = await createFetch(
     `${biliConf.api.live}${room_id}`,
-    5000
+    50000
   ).then(async (resp) => {
     const text = await resp?.text();
     if (text === undefined) {
@@ -253,7 +286,7 @@ async function findLive(room_id: number) {
 async function findDynamic(mid: number) {
   const dynamicInfo: any = await createFetch(
     `${biliConf.api.dynamic}${mid}`,
-    5000
+    50000
   ).then(async (resp) => {
     const text = await resp?.text();
     if (text === undefined) {
