@@ -284,7 +284,7 @@ async function findLive(room_id: number) {
 }
 
 async function findDynamic(mid: number) {
-  const dynamicInfo: any = await createFetch(
+  const dynamicInfo = await createFetch(
     `${biliConf.api.dynamic}${mid}`,
     50000
   ).then(async (resp) => {
