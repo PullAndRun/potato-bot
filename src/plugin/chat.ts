@@ -8,6 +8,8 @@ import * as groupModel from "../model/group";
 import { msgNoCmd, replyGroupMsg } from "../util/bot";
 import { logger } from "../util/logger";
 import dayjs from "dayjs";
+import { createDeepSeek } from "@ai-sdk/deepseek";
+import { CoreMessage, generateText } from "ai";
 
 const info = {
   name: "聊天",
@@ -26,21 +28,30 @@ const openai = new OpenAI({
   baseURL: aiConf.account.sb.baseURL,
 });
 
-const chatMap = new Map<number, { date: Date, chat: string }>();
+const deepseek = createDeepSeek({
+  apiKey: aiConf.account.deepseek.apiKey,
+  baseURL: aiConf.account.deepseek.baseUrl,
+});
+
+const chatMap = new Map<number, { date: Date; chat: string }>();
 //bot聊天内容
 async function plugin(event: GroupMessageEvent) {
   const msg = msgNoCmd(event.raw_message, [botConf.trigger, info.name]);
   const group = await groupModel.findOrAddOne(event.group_id);
-  const history = await chatHistory(event.group_id, msg)
+  const history = await chatHistory(event.group_id, msg);
   //自定义人格
   if (group.promptName === "自定义") {
-    await replyGroupMsg(event, [await createChat(msg, group.customPrompt, history)]);
+    await replyGroupMsg(event, [
+      await createChat(msg, group.customPrompt, history),
+    ]);
     return;
   }
   const commonPrompt = await aiModel.findOne(group.promptName);
   //选定人格
   if (commonPrompt) {
-    await replyGroupMsg(event, [await createChat(msg, commonPrompt.prompt, history)]);
+    await replyGroupMsg(event, [
+      await createChat(msg, commonPrompt.prompt, history),
+    ]);
     return;
   }
   //默认猫娘人格
@@ -50,28 +61,33 @@ async function plugin(event: GroupMessageEvent) {
 async function chatHistory(gid: number, msg: string) {
   const chatInfo = chatMap.get(gid);
   if (!chatInfo) {
-    chatMap.set(gid, { date: dayjs().toDate(), chat: msg })
-    return undefined
+    chatMap.set(gid, { date: dayjs().toDate(), chat: msg });
+    return undefined;
   }
   if (dayjs().subtract(5, "minute").isAfter(chatInfo.date)) {
-    chatMap.delete(gid)
-    return undefined
+    chatMap.delete(gid);
+    return undefined;
   }
-  const newChat = await chat([
-    { role: "system", content: "总结这两段话" },
-    { role: "user", content: chatInfo.chat },
-    { role: "user", content: msg },
-  ], "gpt-3.5-turbo")
-  chatMap.set(gid, { date: dayjs().toDate(), chat: newChat })
-  return chatInfo.chat
+  const newChat = await chat(
+    [
+      { role: "system", content: "总结这两段话" },
+      { role: "user", content: chatInfo.chat },
+      { role: "user", content: msg },
+    ],
+    "gpt-3.5-turbo"
+  );
+  chatMap.set(gid, { date: dayjs().toDate(), chat: newChat });
+  return chatInfo.chat;
 }
 
-async function createChat(msg: string, prompt: string | undefined = undefined, history: string | undefined = undefined) {
-  const gptMessages: ChatCompletionMessageParam[] = [
-    { role: "user", content: msg },
-  ];
+async function createChat(
+  msg: string,
+  prompt: string | undefined = undefined,
+  history: string | undefined = undefined
+) {
+  const gptMessages: CoreMessage[] = [{ role: "user", content: msg }];
   if (history) {
-    gptMessages.unshift({ role: "user", content: history })
+    gptMessages.unshift({ role: "user", content: history });
   }
   if (!prompt) {
     const catAi = await aiModel.findOne("猫娘");
@@ -79,16 +95,19 @@ async function createChat(msg: string, prompt: string | undefined = undefined, h
       return "未查询到默认prompts，请联系管理员。";
     }
     gptMessages.unshift({ role: "system", content: catAi.prompt });
-    return chat(gptMessages);
+    return deepSeekChat(gptMessages);
   }
   if (prompt === "openai") {
-    return chat([{ role: "user", content: msg }]);
+    return deepSeekChat([{ role: "user", content: msg }]);
   }
   gptMessages.unshift({ role: "system", content: prompt });
-  return chat(gptMessages);
+  return deepSeekChat(gptMessages);
 }
 
-async function chat(msg: ChatCompletionMessageParam[], model: OpenAI.Chat.ChatModel = "gpt-4o-mini") {
+async function chat(
+  msg: ChatCompletionMessageParam[],
+  model: OpenAI.Chat.ChatModel = "gpt-4o-mini"
+) {
   const response = await openai.chat.completions
     .create({
       model: model,
@@ -109,6 +128,16 @@ async function chat(msg: ChatCompletionMessageParam[], model: OpenAI.Chat.ChatMo
     return "AI系统异常，请重试。";
   }
   return response.replace(/^(\n+)/g, "").replace(/\n+/g, "\n");
+}
+
+async function deepSeekChat(msg: CoreMessage[]) {
+  const { text } = await generateText({
+    model: deepseek("deepseek-ai/DeepSeek-R1"),
+    messages: msg,
+  }).catch((_) => {
+    return { text: "AI系统异常，请重试。" };
+  });
+  return text;
 }
 
 export { info, createChat };

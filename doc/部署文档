@@ -47,3 +47,17 @@ docker network create change-this
 
 ---icqq
 npm login --scope=@icqqjs --auth-type=legacy --registry=https://npm.pkg.github.com
+
+docker run \
+    -d \
+    --name kikoeru \
+    -p 2001:2333 \
+    -v $PWD/data:/opt/kikoeru/data \
+    -e TZ=Asia/Shanghai \
+    -e PUID=$(id -u) \
+    -e PGID=$(id -g) \
+    -e UMASK=022 \
+    --restart always \
+    ghcr.io/vscodev/kikoeru:latest
+
+successfully initialized admin account, the username is [admin] and password is [VWgA63Vf]
